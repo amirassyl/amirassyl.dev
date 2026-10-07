@@ -14,21 +14,21 @@ const { Content } = await render(project);
 ---
 
 <Base title={title} description={summary} type="article">
-  <article class="narrow">
+  <article class="wrap page">
     <header>
-      <p class="eyebrow"><a href="/projects/">Projects</a> / {context}</p>
+      <p class="meta"><a href="/projects/">Projects</a> / {context}</p>
       <h1>{title}</h1>
-      <p class="lede muted">{summary}</p>
+      <p class="lede">{summary}</p>
       <dl>
         <div><dt>When</dt><dd>{period}</dd></div>
         <div>
           <dt>Stack</dt>
-          <dd><ul class="tags">{stack.map((s) => <li>{s}</li>)}</ul></dd>
+          <dd>{stack.join(', ')}</dd>
         </div>
       </dl>
       <div class="actions">
-        {demo && <a class="btn primary" href={demo} rel="noopener">Live prototype</a>}
-        {repo && <a class="btn" href={repo} rel="noopener">Source on GitHub</a>}
+        {demo && <a href={demo} rel="noopener">Live prototype</a>}
+        {repo && <a href={repo} rel="noopener">Source on GitHub</a>}
       </div>
     </header>
     <div class="prose"><Content /></div>
@@ -36,44 +36,35 @@ const { Content } = await render(project);
 </Base>
 
 <style>
-  article {
-    padding-block: clamp(3rem, 9vw, 5.5rem);
-  }
-  .eyebrow a {
-    text-decoration: none;
+  header {
+    margin-bottom: var(--space-7);
   }
   h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
-  }
-  .lede {
-    font-size: 1.15rem;
+    font-size: var(--text-2xl);
   }
   dl {
-    margin: 1.5rem 0;
-    padding-block: 1rem;
-    border-block: 1px solid var(--line);
+    margin: var(--space-5) 0 0;
+    padding-block: var(--space-4);
+    border-block: var(--border);
     display: grid;
-    gap: 0.75rem;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
   }
   dl div {
     display: grid;
-    grid-template-columns: 4.5rem 1fr;
-    gap: 1rem;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: var(--space-4);
     align-items: baseline;
   }
   dt {
-    font: 0.75rem var(--mono);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-family: var(--font-meta);
+    font-size: var(--text-xs);
     color: var(--muted);
   }
   dd {
     margin: 0;
   }
   .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    margin-bottom: 2.5rem;
+    margin-top: var(--space-4);
   }
 </style>

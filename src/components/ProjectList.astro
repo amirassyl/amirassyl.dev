@@ -1,0 +1,61 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  projects: CollectionEntry<'projects'>[];
+  /** Heading level for project titles, so the outline fits the page. */
+  heading?: 'h2' | 'h3';
+}
+
+const { projects, heading: Heading = 'h3' } = Astro.props;
+---
+
+<ul class="projects">
+  {
+    projects.map((project) => (
+      <li>
+        <p class="meta">{project.data.context}</p>
+        <Heading class="title">
+          <a class="title-link" href={`/projects/${project.id}/`}>
+            {project.data.title}
+          </a>
+        </Heading>
+        <p class="summary muted">{project.data.summary}</p>
+        <p class="meta stack">{project.data.stack.slice(0, 5).join(' · ')}</p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .projects {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  li {
+    padding-block: var(--space-5);
+    border-top: var(--border);
+  }
+  li:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  li:last-child {
+    padding-bottom: 0;
+  }
+  .meta {
+    margin-bottom: var(--space-2);
+  }
+  .title {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+  }
+  .summary {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-3);
+  }
+  .stack {
+    margin: 0;
+  }
+</style>

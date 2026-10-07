@@ -14,11 +14,11 @@ const { Content } = await render(post);
 ---
 
 <Base title={title} description={description} type="article">
-  <article class="narrow">
+  <article class="wrap page">
     <header>
-      <p class="eyebrow"><a href="/blog/">Writing</a></p>
+      <p class="meta"><a href="/blog/">Writing</a></p>
       <h1>{title}</h1>
-      <p class="muted meta">
+      <p class="meta date">
         <time datetime={date.toISOString()}>{formatDate(date)}</time>
         {tags.length > 0 && <span> · {tags.join(', ')}</span>}
       </p>
@@ -28,17 +28,13 @@ const { Content } = await render(post);
 </Base>
 
 <style>
-  article {
-    padding-block: clamp(3rem, 9vw, 5.5rem);
-  }
-  .eyebrow a {
-    text-decoration: none;
+  header {
+    margin-bottom: var(--space-7);
   }
   h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: var(--text-2xl);
   }
-  .meta {
-    font: 0.85rem var(--mono);
-    margin-bottom: 2.5rem;
+  .date {
+    margin: 0;
   }
 </style>

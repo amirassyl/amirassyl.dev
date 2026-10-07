@@ -7,8 +7,8 @@ const posts = await getPosts();
 ---
 
 <Base title="Writing" description="Notes on what I'm building and learning.">
-  <section class="narrow page">
-    <p class="eyebrow">Writing</p>
+  <section class="wrap page">
+    <p class="meta">Writing</p>
     <h1>Notes</h1>
     <p class="muted intro">What I'm building and learning. <a href="/rss.xml">Subscribe by RSS</a>.</p>
     {posts.length > 0 ? <PostList posts={posts} /> : <p class="muted">Nothing published yet.</p>}
@@ -16,10 +16,7 @@ const posts = await getPosts();
 </Base>
 
 <style>
-  .page {
-    padding-block: clamp(3rem, 9vw, 5.5rem);
-  }
   .intro {
-    margin-bottom: 2.5rem;
+    margin-bottom: var(--space-7);
   }
 </style>
