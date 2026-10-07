@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { getProjects } from '../../lib/content';
+import { projectSchema } from '../../lib/structured-data';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -9,11 +10,12 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
-const { title, summary, context, period, stack, repo, demo } = project.data;
+const { title, summary, metaDescription, context, period, stack, repo, demo } = project.data;
 const { Content } = await render(project);
+const structuredData = projectSchema(project, Astro.site!);
 ---
 
-<Base title={title} description={summary} type="article">
+<Base title={title} description={metaDescription ?? summary} type="article" structuredData={structuredData}>
   <article class="wrap page">
     <header>
       <p class="meta"><a href="/projects/">Projects</a> / {context}</p>

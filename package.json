@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "og": "node scripts/generate-og-image.mjs",
     "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {

@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { getPosts, formatDate } from '../../lib/content';
+import { blogPostingSchema } from '../../lib/structured-data';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -11,9 +12,10 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { title, description, date, tags } = post.data;
 const { Content } = await render(post);
+const structuredData = blogPostingSchema(post, Astro.site!);
 ---
 
-<Base title={title} description={description} type="article">
+<Base title={title} description={description} type="article" publishedTime={date} structuredData={structuredData}>
   <article class="wrap page">
     <header>
       <p class="meta"><a href="/blog/">Writing</a></p>

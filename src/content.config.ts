@@ -7,6 +7,8 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     summary: z.string(),
+    // Shorter text for the meta description when the summary runs past ~160 characters.
+    metaDescription: z.string().max(160).optional(),
     context: z.string(),
     period: z.string(),
     stack: z.array(z.string()),

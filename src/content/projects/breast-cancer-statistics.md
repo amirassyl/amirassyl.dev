@@ -37,6 +37,10 @@ I fitted a simple linear regression of mean concavity on mean radius, then check
 
 Radius explains about 46% of the variation in concavity. The slope is clearly non-zero, but the residuals are right-skewed: concavity cannot go below zero, which puts a hard lower edge on the residuals while a few tumors sit far above the line. The normality assumption does not fully hold, and I say so in the write-up.
 
+![Two panels. Left: scatter plot of mean concavity against mean radius in micrometers for the 569 tumors, with an upward-sloping fitted regression line. Right: the residuals plotted against mean radius, with most points in a dense band just below zero and a scattering of points far above it.](../../assets/projects/breast-cancer-statistics/regression-fit-and-residuals.png)
+
+![Histogram of the regression residuals. Most fall between −0.1 and 0.1 with the tallest bars just below zero, and a thin tail extends to the right as far as about 0.4.](../../assets/projects/breast-cancer-statistics/residual-histogram.png)
+
 ## Background
 
 The notebooks started from a course template, and the regression plotting helper follows the template's structure. The analysis, statistics functions, and interpretation are my own.
