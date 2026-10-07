@@ -21,11 +21,6 @@ To turn deploys on:
 
 1. Create an API token in the Cloudflare dashboard (My Profile or Manage Account, then API Tokens, Create Token) using the "Edit Cloudflare Workers" template. The permission that matters is Account, Workers Scripts, Edit. Scope it to my account only.
 2. Under the repo's Settings, Secrets and variables, Actions, add two repository secrets: `CLOUDFLARE_API_TOKEN` (the token) and `CLOUDFLARE_ACCOUNT_ID` (shown on the Workers & Pages overview page).
-3. Push to `main` (or re-run the latest workflow). The site goes live at `amirassyl-com.<subdomain>.workers.dev`.
+3. Push to `main` (or re-run the latest workflow). The site goes live at `amirassyl-dev.<subdomain>.workers.dev`.
 
-Custom domain (amirassyl.dev is registered at Name.com):
-
-1. Add the domain to Cloudflare as a zone and point the registrar's nameservers at Cloudflare.
-2. Uncomment the `routes` entry in `wrangler.jsonc` (`{ "pattern": "amirassyl.dev", "custom_domain": true }`). Add `www.amirassyl.dev` as a second entry if I want it.
-3. Add "Zone, Workers Routes, Edit" to the API token if the deploy complains about permissions, then push to `main`.
-
+Custom domain: amirassyl.dev is registered at Name.com and uses Cloudflare nameservers. The `routes` entries in `wrangler.jsonc` attach the apex and `www` to the Worker on each deploy. If a deploy complains about permissions, add "Zone, Workers Routes, Edit" to the API token.
