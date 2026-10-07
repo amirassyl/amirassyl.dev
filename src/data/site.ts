@@ -6,7 +6,7 @@ export const site = {
   title: 'Amirassyl Sagyndyk — software, simulation, and things that move',
   description:
     'Computational Sciences student at Minerva University. I build interactive web experiences and numerical models. Open to software internships for summer 2027.',
-  url: 'https://amirassyl.com',
+  url: 'https://amirassyl.dev',
   email: 'amirassyl@uni.minerva.edu',
   location: 'Tokyo this semester · San Francisco from summer 2027',
   links: {

@@ -6,7 +6,7 @@
     "directory": "./dist",
     "not_found_handling": "404-page"
   }
-  // Once amirassyl.com is registered and added to Cloudflare, attach it here
+  // Once amirassyl.dev is added to Cloudflare as a zone, attach it here
   // (add a comma after the "assets" block above):
-  // "routes": [{ "pattern": "amirassyl.com", "custom_domain": true }]
+  // "routes": [{ "pattern": "amirassyl.dev", "custom_domain": true }]
 }

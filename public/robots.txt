@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://amirassyl.com/sitemap-index.xml
+Sitemap: https://amirassyl.dev/sitemap-index.xml
