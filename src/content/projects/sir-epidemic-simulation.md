@@ -36,6 +36,14 @@ The reported standard deviation of `b` is 0.075, so I also ran `b = 0.10` and `b
 
 A higher infection rate gives an earlier and taller peak of infections. A higher removal rate lowers and flattens the peak, and leaves more of the population never infected.
 
+The baseline run:
+
+![Line chart of the baseline run (b = 0.17, k = 0.04) over 250 days. The susceptible curve falls from 500,000 in an S shape, the infected curve rises to a single peak a little after day 100 and falls back, and the removed curve climbs to nearly the whole population.](../../assets/projects/sir-epidemic-simulation/baseline-run.png)
+
+The higher infection rate, `b = 0.25`:
+
+![Line chart of the higher infection rate run (b = 0.25, k = 0.04) over 200 days. The infected curve peaks before day 75, earlier and higher than in the baseline run, and the susceptible curve drops to almost zero.](../../assets/projects/sir-epidemic-simulation/higher-infection-rate.png)
+
 ## Assumptions and limits
 
 - Everyone mixes with everyone equally. There are no households, ages, or districts.
