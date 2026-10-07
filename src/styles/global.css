@@ -65,20 +65,6 @@
   color-scheme: light;
 }
 
-/* Dark scheme: secondary, same structure with inverted neutrals. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111113;
-    --surface: #1b1b1f;
-    --line: #2c2c31;
-    --text: #ececea;
-    --muted: #a3a3aa;
-    --accent: #93b4ff;
-    --accent-ink: #0b1020;
-    color-scheme: dark;
-  }
-}
-
 /* Print is always black on white, whatever the screen scheme. */
 @media print {
   :root {
