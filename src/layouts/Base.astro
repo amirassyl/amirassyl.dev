@@ -1,0 +1,159 @@
+---
+import '../styles/global.css';
+import { site, nav } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  type?: 'website' | 'article';
+}
+
+const { title, description = site.description, type = 'website' } = Astro.props;
+const pageTitle = title ? `${title} · ${site.name}` : site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const path = Astro.url.pathname;
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: site.url,
+  email: `mailto:${site.email}`,
+  sameAs: Object.values(site.links),
+  alumniOf: 'Minerva University',
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} — Writing`} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="theme-color" content="#08080a" />
+    <script type="application/ld+json" set:html={JSON.stringify(person)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a class="brand" href="/">{site.shortName}<span aria-hidden="true">.</span></a>
+        <nav aria-label="Primary">
+          <ul>
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap bar">
+        <p class="muted">© {new Date().getFullYear()} {site.name}</p>
+        <ul>
+          <li><a href={`mailto:${site.email}`}>Email</a></li>
+          <li><a href={site.links.github} rel="me noopener">GitHub</a></li>
+          <li><a href={site.links.linkedin} rel="me noopener">LinkedIn</a></li>
+          <li><a href="/rss.xml">RSS</a></li>
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: -999px;
+    top: 0.5rem;
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    z-index: 10;
+  }
+  .skip:focus {
+    left: 0.5rem;
+  }
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .site-header {
+    padding-block: 1.1rem;
+    position: sticky;
+    top: 0;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(10px);
+    z-index: 5;
+  }
+  .brand {
+    font: 500 1.25rem var(--serif);
+    text-decoration: none;
+  }
+  .brand span {
+    color: var(--accent);
+  }
+  ul {
+    display: flex;
+    gap: 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+  nav a,
+  .site-footer a {
+    text-decoration: none;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  nav a:hover,
+  .site-footer a:hover,
+  nav a[aria-current='page'] {
+    color: var(--text);
+  }
+  nav a[aria-current='page'] {
+    box-shadow: 0 2px 0 var(--accent);
+  }
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding-block: 2rem;
+    font-size: 0.95rem;
+  }
+  .site-footer p {
+    margin: 0;
+  }
+  @media print {
+    .site-header,
+    .site-footer,
+    .skip {
+      display: none;
+    }
+  }
+</style>

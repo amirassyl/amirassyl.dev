@@ -1,0 +1,156 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import PostList from '../components/PostList.astro';
+import { site, experience } from '../data/site';
+import { getProjects, getPosts } from '../lib/content';
+
+const projects = (await getProjects()).filter((p) => p.data.featured);
+const posts = (await getPosts()).slice(0, 3);
+---
+
+<Base>
+  <section class="hero wrap">
+    <p class="eyebrow">{site.status}</p>
+    <h1>Amirassyl Sagyndyk builds software you can see, hear, and <em>move through</em>.</h1>
+    <p class="lede">
+      I study Computational Sciences at Minerva University, a programme that moves between cities. I'm from
+      Kazakhstan, in Tokyo this semester, and back in San Francisco for summer 2027. I like work where math meets
+      an interface: pose tracking in the browser, numerical solvers written from scratch, real-time 3D.
+    </p>
+    <div class="actions">
+      <a class="btn primary" href="/projects/">See projects</a>
+      <a class="btn" href="/resume/">Résumé</a>
+      <a class="btn" href={`mailto:${site.email}`}>Email me</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Selected projects</h2>
+        <a href="/projects/">All projects →</a>
+      </div>
+      <div class="grid">
+        {projects.map((project) => <ProjectCard project={project} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Experience</h2>
+        <a href="/resume/">Full résumé →</a>
+      </div>
+      <ol class="timeline">
+        {
+          experience.map((job) => (
+            <li>
+              <span class="period">{job.period}</span>
+              <div>
+                <h3>{job.org}</h3>
+                <p class="muted">{job.role}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  {
+    posts.length > 0 && (
+      <section class="section">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Writing</h2>
+            <a href="/blog/">All posts →</a>
+          </div>
+          <PostList posts={posts} />
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <div class="wrap contact">
+      <h2>Get in touch</h2>
+      <p class="muted">
+        I'm looking for a software engineering internship for summer 2027, anywhere in the US. I'm eligible for CPT.
+        The fastest way to reach me is email.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href={`mailto:${site.email}`}>{site.email}</a>
+        <a class="btn" href={site.links.linkedin} rel="noopener">LinkedIn</a>
+        <a class="btn" href={site.links.github} rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: clamp(3.5rem, 12vw, 8rem) clamp(3rem, 8vw, 5.5rem);
+  }
+  .hero h1 {
+    max-width: 18ch;
+  }
+  .hero em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .lede {
+    max-width: 38rem;
+    font-size: 1.15rem;
+    color: var(--muted);
+    margin-top: 1.5rem;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.75rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 1rem;
+  }
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .timeline li {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 1rem;
+    padding-block: 1rem;
+    border-top: 1px solid var(--line);
+  }
+  .timeline li:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .timeline h3 {
+    margin: 0;
+  }
+  .timeline p {
+    margin: 0.2rem 0 0;
+    font-size: 0.975rem;
+  }
+  .period {
+    font: 0.8rem/1.9 var(--mono);
+    color: var(--muted);
+  }
+  .contact p {
+    max-width: 36rem;
+  }
+  @media (max-width: 34rem) {
+    .timeline li {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+</style>

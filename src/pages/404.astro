@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Not found">
+  <section class="narrow">
+    <p class="eyebrow">404</p>
+    <h1>This page wandered off.</h1>
+    <p class="muted">The link is broken or the page moved.</p>
+    <a class="btn primary" href="/">Back home</a>
+  </section>
+</Base>
+
+<style>
+  section {
+    padding-block: clamp(4rem, 14vw, 9rem);
+  }
+</style>

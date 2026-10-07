@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, summary, context, stack } = project.data;
+---
+
+<article class="card">
+  <p class="context">{context}</p>
+  <h3><a href={`/projects/${project.id}/`}>{title}</a></h3>
+  <p class="muted">{summary}</p>
+  <ul class="tags">
+    {stack.slice(0, 5).map((s) => <li>{s}</li>)}
+  </ul>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 1.4rem;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .card:hover,
+  .card:focus-within {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .context {
+    font: 0.75rem/1.3 var(--mono);
+    color: var(--jade);
+    margin: 0 0 0.75rem;
+  }
+  h3 {
+    margin-bottom: 0.5rem;
+  }
+  h3 a {
+    text-decoration: none;
+  }
+  /* Whole card is the click target */
+  h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+  }
+  .muted {
+    font-size: 0.975rem;
+    flex: 1;
+  }
+</style>

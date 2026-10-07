@@ -1,0 +1,204 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, experience, education, skills } from '../data/site';
+import { getProjects } from '../lib/content';
+
+const projects = await getProjects();
+---
+
+<Base title="Résumé" description="Résumé of Amirassyl Sagyndyk: experience, education, projects, and skills.">
+  <article class="narrow resume">
+    <header>
+      <h1>{site.name}</h1>
+      <p class="muted">
+        <a href={`mailto:${site.email}`}>{site.email}</a> ·
+        <a href={site.links.linkedin} rel="noopener">linkedin.com/in/amirassyl</a> ·
+        <a href={site.links.github} rel="noopener">github.com/amirassyl</a>
+      </p>
+      <p class="muted">Eligible for CPT.</p>
+      <button class="btn print" type="button" onclick="window.print()">Print / save as PDF</button>
+    </header>
+
+    <section>
+      <h2>Experience</h2>
+      {
+        experience.map((job) => (
+          <div class="entry">
+            <div class="row">
+              <h3>{job.org}</h3>
+              <span class="period">{job.period}</span>
+            </div>
+            <p class="role">{job.role}</p>
+            <ul>{job.points.map((point) => <li>{point}</li>)}</ul>
+          </div>
+        ))
+      }
+    </section>
+
+    <section>
+      <h2>Education</h2>
+      {
+        education.map((school) => (
+          <div class="entry">
+            <div class="row">
+              <h3>{school.org}</h3>
+              <span class="period">{school.period}</span>
+            </div>
+            <p class="role">{school.detail}</p>
+            <ul>{school.points.map((point) => <li>{point}</li>)}</ul>
+          </div>
+        ))
+      }
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      {
+        projects.map((project) => (
+          <div class="entry">
+            <div class="row">
+              <h3><a href={`/projects/${project.id}/`}>{project.data.title}</a></h3>
+              <span class="period">{project.data.period}</span>
+            </div>
+            <p class="role">{project.data.stack.slice(0, 5).join(', ')}</p>
+            <p>{project.data.summary}</p>
+          </div>
+        ))
+      }
+    </section>
+
+    <section>
+      <h2>Skills</h2>
+      <dl>
+        {
+          skills.map((skill) => (
+            <div>
+              <dt>{skill.group}</dt>
+              <dd>{skill.items.join(', ')}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .resume {
+    padding-block: clamp(3rem, 9vw, 5.5rem);
+  }
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+  }
+  header p {
+    margin: 0 0 0.3rem;
+    font-size: 0.95rem;
+  }
+  .print {
+    margin-top: 1rem;
+    background: none;
+    color: inherit;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  section {
+    margin-top: 2.5rem;
+  }
+  h2 {
+    font: 500 0.8rem var(--mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 1.25rem;
+  }
+  .entry {
+    margin-bottom: 1.5rem;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  h3 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+  h3 a {
+    text-decoration: none;
+  }
+  .period {
+    font: 0.8rem var(--mono);
+    color: var(--muted);
+  }
+  .role {
+    font-style: italic;
+    color: var(--muted);
+    margin: 0.15rem 0 0.5rem;
+    font-size: 0.975rem;
+  }
+  ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.975rem;
+  }
+  li {
+    margin-bottom: 0.3rem;
+  }
+  .entry > p:last-child {
+    margin: 0;
+    font-size: 0.975rem;
+  }
+  dl {
+    margin: 0;
+    display: grid;
+    gap: 0.6rem;
+    font-size: 0.975rem;
+  }
+  dl div {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 1rem;
+  }
+  dt {
+    color: var(--muted);
+  }
+  dd {
+    margin: 0;
+  }
+  @media (max-width: 34rem) {
+    dl div {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+  @media print {
+    :global(:root) {
+      --bg: #fff;
+      --text: #000;
+      --muted: #333;
+      --accent: #000;
+      --line: #999;
+    }
+    :global(body) {
+      font-size: 10.5pt;
+    }
+    .print {
+      display: none;
+    }
+    .resume {
+      padding: 0;
+      width: 100%;
+    }
+    section {
+      margin-top: 1.1rem;
+    }
+    .entry {
+      break-inside: avoid;
+      margin-bottom: 0.8rem;
+    }
+  }
+</style>

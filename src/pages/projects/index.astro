@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects } from '../../lib/content';
+
+const projects = await getProjects();
+---
+
+<Base title="Projects" description="Case studies: an Exploratorium exhibit prototype, a civic-data hackathon build, and two modeling projects.">
+  <section class="wrap head">
+    <p class="eyebrow">Projects</p>
+    <h1>Things I've built</h1>
+    <p class="muted">Each one links to a write-up of what it does, how it works, and what I'd change.</p>
+  </section>
+  <section class="wrap grid">
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </section>
+</Base>
+
+<style>
+  .head {
+    padding-block: clamp(3rem, 9vw, 5.5rem) 2rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: 1rem;
+    padding-bottom: clamp(3rem, 8vw, 5rem);
+  }
+</style>

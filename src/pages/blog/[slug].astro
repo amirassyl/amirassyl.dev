@@ -1,0 +1,44 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getPosts, formatDate } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { title, description, date, tags } = post.data;
+const { Content } = await render(post);
+---
+
+<Base title={title} description={description} type="article">
+  <article class="narrow">
+    <header>
+      <p class="eyebrow"><a href="/blog/">Writing</a></p>
+      <h1>{title}</h1>
+      <p class="muted meta">
+        <time datetime={date.toISOString()}>{formatDate(date)}</time>
+        {tags.length > 0 && <span> · {tags.join(', ')}</span>}
+      </p>
+    </header>
+    <div class="prose"><Content /></div>
+  </article>
+</Base>
+
+<style>
+  article {
+    padding-block: clamp(3rem, 9vw, 5.5rem);
+  }
+  .eyebrow a {
+    text-decoration: none;
+  }
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+  .meta {
+    font: 0.85rem var(--mono);
+    margin-bottom: 2.5rem;
+  }
+</style>
