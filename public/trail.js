@@ -20,6 +20,8 @@
   const ORBIT_SPEED = 0.12; // slow rotation of the whole group, radians per second
   const REPEL_STRENGTH = 30000; // how hard nearby dots push each other apart; 0 turns it off
   const REPEL_REACH = 14; // px beyond touching at which two dots start to feel each other
+  const TEXT_OPACITY = 0.45; // dot strength while the pointer is over text (1 = no change)
+  const TEXT_MARGIN = 6; // px around a letter that still counts as being over text
   const FADE_SPEED = 10; // how fast the dots appear and disappear, per second
 
   // Nothing for people who ask for less motion, or on devices without a mouse.
@@ -43,10 +45,44 @@
   if (!ctx) return;
 
   const random = (min, max) => min + Math.random() * (max - min);
-  const pointer = { x: 0, y: 0, inside: false, seen: false, pressed: false };
+  const pointer = { x: 0, y: 0, inside: false, seen: false, pressed: false, overText: false };
   // Dots show while the pointer is on the page and the mouse button is up,
   // so they get out of the way while text is being selected.
   const visible = () => pointer.inside && !pointer.pressed;
+
+  // Is there a letter under (or right next to) this point? Asks the browser which
+  // character a click here would land on, then checks the point is really on it.
+  function isOverText(x, y) {
+    let node;
+    let offset;
+    if (document.caretPositionFromPoint) {
+      const position = document.caretPositionFromPoint(x, y);
+      if (!position) return false;
+      node = position.offsetNode;
+      offset = position.offset;
+    } else if (document.caretRangeFromPoint) {
+      const caret = document.caretRangeFromPoint(x, y);
+      if (!caret) return false;
+      node = caret.startContainer;
+      offset = caret.startOffset;
+    }
+    if (!node || node.nodeType !== Node.TEXT_NODE) return false;
+
+    const range = document.createRange();
+    range.setStart(node, Math.max(0, offset - 1));
+    range.setEnd(node, Math.min(node.length, offset + 1));
+    for (const box of range.getClientRects()) {
+      if (
+        x >= box.left - TEXT_MARGIN &&
+        x <= box.right + TEXT_MARGIN &&
+        y >= box.top - TEXT_MARGIN &&
+        y <= box.bottom + TEXT_MARGIN
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
   let opacity = 0;
   let frame = 0;
   let last = 0;
@@ -139,7 +175,7 @@
       step(Math.min(remaining, 1 / 240));
     }
 
-    const target = visible() ? 1 : 0;
+    const target = visible() ? (pointer.overText ? TEXT_OPACITY : 1) : 0;
     opacity += (target - opacity) * Math.min(1, elapsed * FADE_SPEED);
 
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -175,6 +211,7 @@
     'pointermove',
     (event) => {
       if (event.pointerType !== 'mouse') return;
+      pointer.overText = isOverText(event.clientX, event.clientY);
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       // On the first move, or when coming back after fading out, start the dots at their spots.
