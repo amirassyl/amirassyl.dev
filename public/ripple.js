@@ -1,0 +1,40 @@
+// Name ripple: pointing at the name sends one smooth swell outward from the
+// letter under the cursor. Each letter grows and shrinks a moment after its
+// neighbour. The letters and the animation itself are defined in the page's
+// CSS; this script only decides where the ripple starts and when.
+(() => {
+  const STAGGER = 45; // ms between one letter starting and the next
+
+  // Nothing for people who ask for less motion, or on devices without a mouse.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  for (const name of document.querySelectorAll('[data-ripple]')) {
+    const letters = [...name.querySelectorAll('span')];
+    if (!letters.length) continue;
+
+    name.addEventListener('pointerenter', (event) => {
+      // Find the letter closest to where the pointer came in.
+      let origin = 0;
+      let nearest = Infinity;
+      letters.forEach((letter, i) => {
+        const box = letter.getBoundingClientRect();
+        const distance = Math.abs(event.clientX - (box.left + box.width / 2));
+        if (distance < nearest) {
+          nearest = distance;
+          origin = i;
+        }
+      });
+
+      // Letters further from that one start later, so the swell spreads both ways.
+      letters.forEach((letter, i) => {
+        letter.style.animationDelay = `${Math.abs(i - origin) * STAGGER}ms`;
+      });
+
+      // Restart the animation even if a previous ripple is still running.
+      name.classList.remove('rippling');
+      void name.offsetWidth;
+      name.classList.add('rippling');
+    });
+  }
+})();

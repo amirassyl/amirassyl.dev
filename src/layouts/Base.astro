@@ -28,7 +28,9 @@ const path = Astro.url.pathname;
 const image = new URL(defaultImage.path, origin);
 
 // The script URL carries a hash of the file, so browsers fetch a new copy whenever it changes.
-const trailVersion = createHash('sha256').update(readFileSync('public/trail.js')).digest('hex').slice(0, 8);
+const fileVersion = (path: string) => createHash('sha256').update(readFileSync(path)).digest('hex').slice(0, 8);
+const trailVersion = fileVersion('public/trail.js');
+const rippleVersion = fileVersion('public/ripple.js');
 const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [personSchema(origin)] : [];
 ---
 
@@ -83,6 +85,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
       <slot />
     </main>
     <script is:inline defer src={`/trail.js?v=${trailVersion}`}></script>
+    <script is:inline defer src={`/ripple.js?v=${rippleVersion}`}></script>
   </body>
 </html>
 

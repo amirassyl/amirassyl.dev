@@ -11,7 +11,10 @@ const posts = (await getPosts()).slice(0, 5);
 
 <Base>
   <div class="wrap page">
-    <h1 class="name">{site.shortName}</h1>
+    {/* One element per letter so each can swell on its own; read aloud as one word. */}
+    <h1 class="name" aria-label={site.shortName} data-ripple>
+      {[...site.shortName].map((letter) => <span aria-hidden="true">{letter}</span>)}
+    </h1>
     <div class="intro">
       <p>
         I study Computational Sciences at Minerva University, and I move countries every year. This year
@@ -78,6 +81,30 @@ const posts = (await getPosts()).slice(0, 5);
   .name {
     font-size: var(--text-base);
     margin-bottom: var(--space-5);
+    width: fit-content;
+    cursor: default;
+  }
+  .name span {
+    display: inline-block;
+    transform-origin: 50% 85%;
+  }
+  /* Added by ripple.js; each letter gets its own start delay from there. */
+  .name:global(.rippling) span {
+    animation: swell 720ms cubic-bezier(0.37, 0, 0.63, 1) both;
+  }
+  @keyframes swell {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    45% {
+      transform: scale(1.34);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .name:global(.rippling) span {
+      animation: none;
+    }
   }
   .intro p:last-child {
     margin-bottom: 0;
