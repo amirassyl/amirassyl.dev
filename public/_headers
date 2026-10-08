@@ -1,0 +1,29 @@
+# Applied by Cloudflare Workers static assets. Rules that match a request are
+# merged, and a header set by more than one rule gets its values joined, so
+# Cache-Control is kept out of the catch-all rule and given per-path rules.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: accelerometer=(), autoplay=(), camera=(), display-capture=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), usb=(), xr-spatial-tracking=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: default-src 'none'; script-src 'unsafe-hashes' 'sha256-MguIPR6qNR8D3B+eAlK+bIRTZe8t3wkOY4B/56Me9FU='; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; upgrade-insecure-requests
+
+# HTML: revalidate quickly so a deploy shows up within minutes.
+/
+  Cache-Control: public, max-age=300, must-revalidate
+/:a/
+  Cache-Control: public, max-age=300, must-revalidate
+/:a/:b/
+  Cache-Control: public, max-age=300, must-revalidate
+
+# Fingerprinted by Astro, so the URL changes whenever the content does.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fixed URLs, so only a moderate lifetime.
+/og-default.png
+  Cache-Control: public, max-age=86400
+/favicon.svg
+  Cache-Control: public, max-age=86400
