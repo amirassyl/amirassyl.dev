@@ -1,0 +1,23 @@
+---
+// Text whose letters swell one after another when pointed at (see public/ripple.js).
+// Put it inside an element that has `data-ripple` and an `aria-label` with the same
+// text: the label is what gets read aloud, since the letters here are separate pieces.
+interface Props {
+  text: string;
+}
+
+const words = Astro.props.text.split(' ');
+---
+
+{
+  words.map((word, i) => (
+    <>
+      {i > 0 && ' '}
+      <span class="ripple-word">
+        {[...word].map((letter) => (
+          <span class="ripple-letter" aria-hidden="true">{letter}</span>
+        ))}
+      </span>
+    </>
+  ))
+}

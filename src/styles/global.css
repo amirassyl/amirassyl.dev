@@ -14,6 +14,13 @@
   --accent: #1d4ed8; /* focus ring only */
   --accent-ink: #ffffff;
 
+  /* Ripple: letters swell and catch a silver sheen when pointed at */
+  --sheen: #b9bdc7;
+  --ripple-scale: 1.18; /* links inside text */
+  --ripple-time: 720ms;
+  --ripple-big-scale: 1.7; /* the name */
+  --ripple-big-time: 1150ms;
+
   /* Dotted page background */
   --dot: #c2c2b9;
   --dot-size: 1px;
@@ -236,6 +243,66 @@ a:hover {
 }
 .title-link:hover {
   text-decoration-color: currentColor;
+}
+
+/*
+ * Ripple text (Ripple.astro + ripple.js). Each letter is its own box so it can
+ * grow in place; the script adds .rippling and gives every letter a start delay.
+ */
+.ripple-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.ripple-letter {
+  display: inline-block;
+  transform-origin: 50% 85%;
+}
+/* A link's underline does not reach letters that are separate boxes, so draw it as a line under the link. */
+a[data-ripple] {
+  text-decoration: none;
+  border-bottom: 1px solid var(--underline);
+  transition: border-color var(--transition);
+}
+a[data-ripple]:hover {
+  border-bottom-color: currentColor;
+}
+.rippling .ripple-letter {
+  animation: swell var(--ripple-time) cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+@keyframes swell {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(var(--ripple-scale));
+    color: var(--sheen);
+  }
+}
+/* The name gets a bigger, springier version: it rises, overshoots and settles. */
+.ripple-big.rippling .ripple-letter {
+  animation: swell-big var(--ripple-big-time) ease-in-out both;
+}
+@keyframes swell-big {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  28% {
+    transform: translateY(-0.2em) scale(var(--ripple-big-scale));
+    color: var(--sheen);
+  }
+  54% {
+    transform: translateY(0.03em) scale(0.9);
+  }
+  76% {
+    transform: translateY(-0.04em) scale(1.1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rippling .ripple-letter {
+    animation: none;
+  }
 }
 
 /* Lists of things: a title, a grey line under it, optional grey detail on the right. */

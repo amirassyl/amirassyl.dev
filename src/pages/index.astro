@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import ProjectList from '../components/ProjectList.astro';
 import PostList from '../components/PostList.astro';
+import Ripple from '../components/Ripple.astro';
 import { site, experience } from '../data/site';
 import { getProjects, getPosts } from '../lib/content';
 import { videos } from '../data/videos';
@@ -14,13 +15,16 @@ const hasVideos = videos.length > 0;
 
 <Base>
   <div class="wrap page">
-    {/* One element per letter so each can swell on its own; read aloud as one word. */}
-    <h1 class="name" aria-label={site.shortName} data-ripple>
-      {[...site.shortName].map((letter) => <span aria-hidden="true">{letter}</span>)}
+    <h1 class="name ripple-big" aria-label={site.shortName} data-ripple data-ripple-stagger="55">
+      <Ripple text={site.shortName} />
     </h1>
     <div class="intro">
       <p>
-        I study Computational Sciences at Minerva University, and I move countries every year. This year
+        I study Computational Sciences at{' '}
+        <a href="https://www.minerva.edu/about/" rel="noopener" aria-label="Minerva University" data-ripple>
+          <Ripple text="Minerva University" />
+        </a>
+        , and I move countries every year. This year
         that's Japan, and I'm currently in Tokyo.
       </p>
       <p>
@@ -53,7 +57,7 @@ const hasVideos = videos.length > 0;
           ))
         }
       </ul>
-      <p class="more"><a href="/resume/">Full résumé</a></p>
+      <p class="more"><a href="/resume/" aria-label="Full résumé" data-ripple><Ripple text="Full résumé" /></a></p>
     </section>
 
     {
@@ -68,7 +72,7 @@ const hasVideos = videos.length > 0;
     <section class="section">
       <h2 class="label">Contact</h2>
       <p>
-        Outside of code I play classical guitar and piano{hasVideos && <>, and <a href="/videos/">edit videos</a></>}. <br />
+        Outside of code I play classical guitar and piano{hasVideos && <>, and <a href="/videos/" aria-label="edit videos" data-ripple><Ripple text="edit videos" /></a></>}. <br />
         Say hi:{' '}
         <a href={`mailto:${site.email}`}>Email</a>,{' '}
         <a href={site.links.linkedin} rel="noopener">LinkedIn</a>,{' '}
@@ -86,28 +90,6 @@ const hasVideos = videos.length > 0;
     margin-bottom: var(--space-5);
     width: fit-content;
     cursor: default;
-  }
-  .name span {
-    display: inline-block;
-    transform-origin: 50% 85%;
-  }
-  /* Added by ripple.js; each letter gets its own start delay from there. */
-  .name:global(.rippling) span {
-    animation: swell 720ms cubic-bezier(0.37, 0, 0.63, 1) both;
-  }
-  @keyframes swell {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    45% {
-      transform: scale(1.34);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .name:global(.rippling) span {
-      animation: none;
-    }
   }
   .intro p:last-child {
     margin-bottom: 0;
