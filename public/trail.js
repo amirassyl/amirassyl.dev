@@ -1,16 +1,26 @@
-// Mouse trail: small flat dots that drift and fade behind the cursor.
+// Cursor companions: a few flat dots that hover around the pointer on springs.
+// Each dot is pulled toward its own spot near the cursor, overshoots a little
+// when the cursor moves, and keeps drifting gently once the cursor is still.
 // Self-contained: creates its own full-screen canvas and needs no markup or CSS.
+//
+// The spring-and-resistance approach follows the classic "elastic bullets"
+// cursor (see springyEmojiCursor in github.com/tholman/cursor-effects), with a
+// separate resting spot per dot instead of a chain.
 (() => {
   const COLORS = ['#F2AF29', '#2B5490', '#9E382B', '#6E7A68']; // marigold, cobalt, terracotta, sage
+  const COUNT = 5; // keep between 3 and 7
   const MIN_RADIUS = 3.5;
   const MAX_RADIUS = 6;
-  const MIN_LIFE = 1000; // ms
-  const MAX_LIFE = 1500;
-  const FRICTION = 0.94; // velocity kept per frame at 60fps
-  const SPAWN_OFFSET = 8; // px around the pointer
-  const SPAWN_SPEED = 1.4; // px per frame at 60fps
+  const MIN_DISTANCE = 22; // px from the pointer, so no dot sits under it
+  const MAX_DISTANCE = 40;
+  const STIFFNESS = [70, 130]; // spring pull; higher follows the cursor more tightly
+  const DAMPING = [4.5, 7]; // resistance; lower is bouncier
+  const DRIFT = 6; // px each dot wanders around its spot while the cursor is still
+  const DRIFT_SPEED = [0.5, 1.1]; // wander cycles, in radians per second
+  const ORBIT_SPEED = 0.12; // slow rotation of the whole group, radians per second
+  const FADE_SPEED = 4; // how fast the dots appear and disappear, per second
 
-  // No trail for people who ask for less motion, or on devices without a mouse.
+  // Nothing for people who ask for less motion, or on devices without a mouse.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
@@ -28,9 +38,29 @@
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  let particles = [];
+  const random = (min, max) => min + Math.random() * (max - min);
+  const pointer = { x: 0, y: 0, inside: false, seen: false };
+  let opacity = 0;
   let frame = 0;
   let last = 0;
+  let time = 0;
+
+  const dots = Array.from({ length: COUNT }, (_, i) => ({
+    x: 0,
+    y: 0,
+    vx: 0,
+    vy: 0,
+    radius: random(MIN_RADIUS, MAX_RADIUS),
+    color: COLORS[i % COLORS.length],
+    // Spread the dots around the pointer, with some irregularity.
+    angle: (i / COUNT) * Math.PI * 2 + random(-0.35, 0.35),
+    distance: random(MIN_DISTANCE, MAX_DISTANCE),
+    stiffness: random(STIFFNESS[0], STIFFNESS[1]),
+    damping: random(DAMPING[0], DAMPING[1]),
+    driftX: random(DRIFT_SPEED[0], DRIFT_SPEED[1]),
+    driftY: random(DRIFT_SPEED[0], DRIFT_SPEED[1]),
+    phase: random(0, Math.PI * 2),
+  }));
 
   // Match the canvas to the window and the screen's pixel density so dots stay sharp.
   function resize() {
@@ -40,69 +70,95 @@
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   }
 
-  const random = (min, max) => min + Math.random() * (max - min);
+  // Where a dot wants to be right now: its spot around the pointer, plus a slow wander.
+  function restingSpot(dot) {
+    const angle = dot.angle + time * ORBIT_SPEED;
+    return {
+      x: pointer.x + Math.cos(angle) * dot.distance + Math.sin(time * dot.driftX + dot.phase) * DRIFT,
+      y: pointer.y + Math.sin(angle) * dot.distance + Math.cos(time * dot.driftY + dot.phase) * DRIFT,
+    };
+  }
 
-  function spawn(x, y) {
-    const count = Math.random() < 0.5 ? 1 : 2;
-    for (let i = 0; i < count; i++) {
-      const angle = random(0, Math.PI * 2);
-      const speed = random(0.3, SPAWN_SPEED);
-      particles.push({
-        x: x + random(-SPAWN_OFFSET, SPAWN_OFFSET),
-        y: y + random(-SPAWN_OFFSET, SPAWN_OFFSET),
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        radius: random(MIN_RADIUS, MAX_RADIUS),
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        age: 0,
-        life: random(MIN_LIFE, MAX_LIFE),
-      });
-    }
-    if (!frame) {
-      last = performance.now();
-      frame = requestAnimationFrame(tick);
+  function step(dt) {
+    time += dt;
+    for (const dot of dots) {
+      const spot = restingSpot(dot);
+      // Spring toward the spot, resisted in proportion to speed.
+      const ax = (spot.x - dot.x) * dot.stiffness - dot.vx * dot.damping;
+      const ay = (spot.y - dot.y) * dot.stiffness - dot.vy * dot.damping;
+      dot.vx += ax * dt;
+      dot.vy += ay * dt;
+      dot.x += dot.vx * dt;
+      dot.y += dot.vy * dt;
     }
   }
 
   function tick(now) {
-    const elapsed = Math.min(now - last, 50); // a background tab should not cause a jump
+    const elapsed = Math.min((now - last) / 1000, 0.05); // a background tab should not cause a jump
     last = now;
-    const step = elapsed / (1000 / 60);
-    const damping = Math.pow(FRICTION, step);
+
+    // Small fixed steps keep the springs stable at any frame rate.
+    for (let remaining = elapsed; remaining > 0; remaining -= 1 / 240) {
+      step(Math.min(remaining, 1 / 240));
+    }
+
+    const target = pointer.inside ? 1 : 0;
+    opacity += (target - opacity) * Math.min(1, elapsed * FADE_SPEED);
 
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-    for (const p of particles) {
-      p.age += elapsed;
-      p.vx *= damping;
-      p.vy *= damping;
-      p.x += p.vx * step;
-      p.y += p.vy * step;
-
-      const remaining = 1 - p.age / p.life;
-      if (remaining <= 0) continue;
-      ctx.globalAlpha = remaining;
-      ctx.fillStyle = p.color;
+    ctx.globalAlpha = opacity;
+    for (const dot of dots) {
+      ctx.fillStyle = dot.color;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius * remaining, 0, Math.PI * 2);
+      ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
 
-    // Drop finished dots so the list never grows without bound.
-    particles = particles.filter((p) => p.age < p.life);
+    // Stop drawing once the pointer has left and the dots have faded out.
+    if (!pointer.inside && opacity < 0.01) {
+      opacity = 0;
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      frame = 0;
+      return;
+    }
+    frame = requestAnimationFrame(tick);
+  }
 
-    // Stop the loop when nothing is on screen; the next mouse move restarts it.
-    frame = particles.length ? requestAnimationFrame(tick) : 0;
+  function start() {
+    if (frame) return;
+    last = performance.now();
+    frame = requestAnimationFrame(tick);
   }
 
   resize();
   window.addEventListener('resize', resize);
+
   window.addEventListener(
     'pointermove',
     (event) => {
-      if (event.pointerType === 'mouse') spawn(event.clientX, event.clientY);
+      if (event.pointerType !== 'mouse') return;
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+      // On the first move, or when coming back after fading out, start the dots at their spots.
+      if (!pointer.seen || opacity === 0) {
+        for (const dot of dots) {
+          const spot = restingSpot(dot);
+          dot.x = spot.x;
+          dot.y = spot.y;
+          dot.vx = 0;
+          dot.vy = 0;
+        }
+        pointer.seen = true;
+      }
+      pointer.inside = true;
+      start();
     },
     { passive: true },
   );
+
+  // Fade out when the pointer leaves the page.
+  document.documentElement.addEventListener('pointerleave', () => {
+    pointer.inside = false;
+  });
 })();

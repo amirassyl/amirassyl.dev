@@ -1,4 +1,6 @@
 ---
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import '../styles/global.css';
 import { site } from '../data/site';
 import { defaultImage, personSchema, serializeJsonLd, type JsonLd } from '../lib/structured-data';
@@ -24,6 +26,9 @@ const canonical = new URL(Astro.url.pathname, origin);
 const path = Astro.url.pathname;
 
 const image = new URL(defaultImage.path, origin);
+
+// The script URL carries a hash of the file, so browsers fetch a new copy whenever it changes.
+const trailVersion = createHash('sha256').update(readFileSync('public/trail.js')).digest('hex').slice(0, 8);
 const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [personSchema(origin)] : [];
 ---
 
@@ -77,7 +82,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     <main id="main">
       <slot />
     </main>
-    <script is:inline defer src="/trail.js"></script>
+    <script is:inline defer src={`/trail.js?v=${trailVersion}`}></script>
   </body>
 </html>
 
