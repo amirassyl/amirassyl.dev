@@ -17,9 +17,9 @@ const structuredData = projectSchema(project, Astro.site!);
 
 <Base title={title} description={metaDescription ?? summary} type="article" structuredData={structuredData}>
   <article class="wrap page">
-    <header>
-      <p class="meta"><a href="/projects/">Projects</a> / {context}</p>
-      <h1>{title}</h1>
+    <header class="split">
+      <p class="meta full"><a href="/projects/">Projects</a> / {context}</p>
+      <h1 class="full">{title}</h1>
       <p class="lede">{summary}</p>
       <dl>
         <div><dt>When</dt><dd>{period}</dd></div>
@@ -33,7 +33,7 @@ const structuredData = projectSchema(project, Astro.site!);
         {repo && <a href={repo} rel="noopener">Source on GitHub</a>}
       </div>
     </header>
-    <div class="prose"><Content /></div>
+    <div class="prose split-body"><Content /></div>
   </article>
 </Base>
 
@@ -42,10 +42,12 @@ const structuredData = projectSchema(project, Astro.site!);
     margin-bottom: var(--space-7);
   }
   h1 {
-    font-size: var(--text-2xl);
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-5);
   }
   dl {
     margin: var(--space-5) 0 0;
+    max-width: var(--measure-prose);
     padding-block: var(--space-4);
     border-block: var(--border);
     display: grid;

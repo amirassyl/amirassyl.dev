@@ -17,15 +17,15 @@ const structuredData = blogPostingSchema(post, Astro.site!);
 
 <Base title={title} description={description} type="article" publishedTime={date} structuredData={structuredData}>
   <article class="wrap page">
-    <header>
-      <p class="meta"><a href="/blog/">Writing</a></p>
-      <h1>{title}</h1>
+    <header class="split">
+      <p class="meta full"><a href="/blog/">Writing</a></p>
+      <h1 class="full">{title}</h1>
       <p class="meta date">
         <time datetime={date.toISOString()}>{formatDate(date)}</time>
         {tags.length > 0 && <span> · {tags.join(', ')}</span>}
       </p>
     </header>
-    <div class="prose"><Content /></div>
+    <div class="prose split-body"><Content /></div>
   </article>
 </Base>
 
@@ -34,7 +34,8 @@ const structuredData = blogPostingSchema(post, Astro.site!);
     margin-bottom: var(--space-7);
   }
   h1 {
-    font-size: var(--text-2xl);
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-5);
   }
   .date {
     margin: 0;

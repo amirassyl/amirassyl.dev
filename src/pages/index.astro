@@ -10,9 +10,9 @@ const posts = (await getPosts()).slice(0, 3);
 ---
 
 <Base>
-  <section class="hero wrap">
-    <p class="meta">{site.status}</p>
-    <h1>Amirassyl Sagyndyk builds software you can see, hear, and <em>move through</em>.</h1>
+  <section class="hero wrap split">
+    <p class="meta status full">{site.status}</p>
+    <h1 class="full">Amirassyl Sagyndyk builds software you can see, hear, and <em>move through</em>.</h1>
     <p class="lede">
       I study Computational Sciences at Minerva University, a programme that moves between cities. I'm from
       Kazakhstan, in Tokyo this semester, and back in San Francisco for summer 2027. I like work where math meets
@@ -26,7 +26,7 @@ const posts = (await getPosts()).slice(0, 3);
   </section>
 
   <section class="section">
-    <div class="wrap">
+    <div class="wrap split">
       <div class="section-head">
         <h2>Selected projects</h2>
         <a href="/projects/">All projects →</a>
@@ -36,7 +36,7 @@ const posts = (await getPosts()).slice(0, 3);
   </section>
 
   <section class="section">
-    <div class="wrap">
+    <div class="wrap split">
       <div class="section-head">
         <h2>Experience</h2>
         <a href="/resume/">Full résumé →</a>
@@ -60,7 +60,7 @@ const posts = (await getPosts()).slice(0, 3);
   {
     posts.length > 0 && (
       <section class="section">
-        <div class="wrap">
+        <div class="wrap split">
           <div class="section-head">
             <h2>Writing</h2>
             <a href="/blog/">All posts →</a>
@@ -72,8 +72,8 @@ const posts = (await getPosts()).slice(0, 3);
   }
 
   <section class="section">
-    <div class="wrap contact">
-      <h2>Get in touch</h2>
+    <div class="wrap split contact">
+      <h2 class="label side">Get in touch</h2>
       <p class="muted">
         I'm looking for a software engineering internship for summer 2027, anywhere in the US. I'm eligible for CPT.
         The fastest way to reach me is email.
@@ -91,13 +91,30 @@ const posts = (await getPosts()).slice(0, 3);
   .hero {
     padding-block: var(--space-page);
   }
+  .status {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+  .status::before {
+    content: '';
+    flex: none;
+    width: var(--marker);
+    height: var(--marker);
+    background: var(--accent);
+  }
   .hero h1 {
-    max-width: 20ch;
+    font-family: var(--font-display);
+    font-size: var(--text-hero);
+    font-weight: var(--weight-normal);
+    max-width: 17ch;
+    margin-bottom: var(--space-6);
   }
   .hero em {
     font-style: italic;
+    color: var(--accent);
   }
-  .lede {
-    margin-top: var(--space-5);
+  .contact .muted {
+    max-width: var(--measure-prose);
   }
 </style>

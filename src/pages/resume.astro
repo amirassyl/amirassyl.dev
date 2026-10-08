@@ -8,8 +8,8 @@ const projects = await getProjects();
 
 <Base title="Résumé" description="Résumé of Amirassyl Sagyndyk: experience, education, projects, and skills.">
   <article class="wrap page resume">
-    <header>
-      <h1>{site.name}</h1>
+    <header class="split">
+      <h1 class="full">{site.name}</h1>
       <p class="muted">
         <a href={`mailto:${site.email}`}>{site.email}</a>
         {' · '}
@@ -21,8 +21,8 @@ const projects = await getProjects();
       <button class="btn print" type="button" onclick="window.print()">Print / save as PDF</button>
     </header>
 
-    <section>
-      <h2>Experience</h2>
+    <section class="split">
+      <h2 class="label side">Experience</h2>
       {
         experience.map((job) => (
           <div class="entry">
@@ -37,8 +37,8 @@ const projects = await getProjects();
       }
     </section>
 
-    <section>
-      <h2>Education</h2>
+    <section class="split">
+      <h2 class="label side">Education</h2>
       {
         education.map((school) => (
           <div class="entry">
@@ -53,8 +53,8 @@ const projects = await getProjects();
       }
     </section>
 
-    <section>
-      <h2>Projects</h2>
+    <section class="split">
+      <h2 class="label side">Projects</h2>
       {
         projects.map((project) => (
           <div class="entry">
@@ -69,8 +69,8 @@ const projects = await getProjects();
       }
     </section>
 
-    <section>
-      <h2>Skills</h2>
+    <section class="split">
+      <h2 class="label side">Skills</h2>
       <dl>
         {
           skills.map((skill) => (
@@ -87,28 +87,22 @@ const projects = await getProjects();
 
 <style>
   h1 {
-    font-size: var(--text-2xl);
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-4);
   }
   header p {
     margin: 0 0 var(--space-1);
     font-size: var(--text-sm);
   }
   .print {
+    justify-self: start;
     margin-top: var(--space-4);
   }
   section {
     margin-top: var(--space-7);
   }
   h2 {
-    font-family: var(--font-meta);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-    color: var(--muted);
-    padding-bottom: var(--space-2);
-    border-bottom: var(--border);
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-4);
   }
   .entry {
     margin-bottom: var(--space-5);

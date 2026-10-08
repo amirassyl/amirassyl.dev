@@ -7,11 +7,11 @@ const projects = await getProjects();
 ---
 
 <Base title="Projects" description="Case studies: an Exploratorium exhibit prototype, a civic-data hackathon build, and two modeling projects.">
-  <section class="wrap page">
-    <p class="meta">Projects</p>
+  <section class="wrap page split">
+    <p class="label side">Projects</p>
     <h1>Things I've built</h1>
     <p class="muted intro">Each one links to a write-up of what it does, how it works, and what I'd change.</p>
-    <ProjectList projects={projects} heading="h2" />
+    <div class="full"><ProjectList projects={projects} heading="h2" /></div>
   </section>
 </Base>
 
