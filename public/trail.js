@@ -18,6 +18,8 @@
   const DRIFT = 3; // px each dot wanders around its spot while the cursor is still
   const DRIFT_SPEED = [0.5, 1.1]; // wander cycles, in radians per second
   const ORBIT_SPEED = 0.12; // slow rotation of the whole group, radians per second
+  const REPEL_STRENGTH = 30000; // how hard nearby dots push each other apart; 0 turns it off
+  const REPEL_REACH = 14; // px beyond touching at which two dots start to feel each other
   const FADE_SPEED = 10; // how fast the dots appear and disappear, per second
 
   // Nothing for people who ask for less motion, or on devices without a mouse.
@@ -89,6 +91,35 @@
       const ay = (spot.y - dot.y) * dot.stiffness - dot.vy * dot.damping;
       dot.vx += ax * dt;
       dot.vy += ay * dt;
+    }
+
+    // Like magnets with the same pole facing: dots push each other away before
+    // they touch, harder the closer they get.
+    for (let i = 0; i < dots.length; i++) {
+      for (let j = i + 1; j < dots.length; j++) {
+        const a = dots[i];
+        const b = dots[j];
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let gap = Math.hypot(dx, dy);
+        const range = a.radius + b.radius + REPEL_REACH;
+        if (gap >= range) continue;
+        if (gap < 0.01) {
+          // Exactly on top of each other: pick a direction so they can separate.
+          dx = Math.cos(i + j);
+          dy = Math.sin(i + j);
+          gap = 1;
+        }
+        const closeness = 1 - gap / range;
+        const push = REPEL_STRENGTH * closeness * closeness * dt;
+        a.vx -= (dx / gap) * push;
+        a.vy -= (dy / gap) * push;
+        b.vx += (dx / gap) * push;
+        b.vy += (dy / gap) * push;
+      }
+    }
+
+    for (const dot of dots) {
       dot.x += dot.vx * dt;
       dot.y += dot.vy * dt;
     }
