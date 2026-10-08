@@ -7,7 +7,7 @@
 // cursor (see springyEmojiCursor in github.com/tholman/cursor-effects), with a
 // separate resting spot per dot instead of a chain.
 (() => {
-  const COLORS = ['#F2AF29', '#2B5490', '#9E382B', '#6E7A68']; // marigold, cobalt, terracotta, sage
+  const COLORS = ['#F2AF29']; // marigold, cobalt, terracotta, sage '#2B5490', '#9E382B', '#6E7A68'
   const COUNT = [5,10]; // keep between 3 and 7
   const MIN_RADIUS = 3.5;
   const MAX_RADIUS = 6;
