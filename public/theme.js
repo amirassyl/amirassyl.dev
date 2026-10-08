@@ -47,7 +47,12 @@
     const toNight = theme === 'dark';
 
     // Going to day, the old (night) picture stays on top and shrinks away.
+    // Going to night, the new picture starts as a zero-size circle at the button
+    // (set in CSS through these values), so it never shows in full before growing.
+    root.style.setProperty('--theme-x', `${x}px`);
+    root.style.setProperty('--theme-y', `${y}px`);
     root.classList.toggle('theme-shrinking', !toNight);
+    root.classList.toggle('theme-growing', toNight);
     const transition = document.startViewTransition(() => paint(theme));
     transition.ready.then(() => {
       root.animate(
@@ -60,7 +65,7 @@
         },
       );
     });
-    transition.finished.finally(() => root.classList.remove('theme-shrinking'));
+    transition.finished.finally(() => root.classList.remove('theme-shrinking', 'theme-growing'));
   }
 
   paint(currentTheme());

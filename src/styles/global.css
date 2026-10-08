@@ -123,6 +123,10 @@
   animation: none;
   mix-blend-mode: normal;
 }
+/* Going to night: the new picture waits as a point at the button until its circle starts growing. */
+.theme-growing::view-transition-new(root) {
+  clip-path: circle(0 at var(--theme-x, 100%) var(--theme-y, 0));
+}
 .theme-shrinking::view-transition-old(root) {
   z-index: 2;
 }

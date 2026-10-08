@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { site } from '../data/site';
 import { fileVersion } from '../lib/assets';
+import { videos } from '../data/videos';
 import { defaultImage, personSchema, serializeJsonLd, type JsonLd } from '../lib/structured-data';
 
 interface Props {
@@ -32,6 +33,7 @@ const image = new URL(defaultImage.path, origin);
 const trailVersion = fileVersion('public/trail.js');
 const rippleVersion = fileVersion('public/ripple.js');
 const themeVersion = fileVersion('public/theme.js');
+const hasVideos = videos.length > 0;
 const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [personSchema(origin)] : [];
 ---
 
@@ -68,15 +70,27 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <button class="theme-toggle" type="button" aria-label="Switch to night mode" aria-pressed="false">
-      <svg class="moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-        <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />
-      </svg>
-      <svg class="sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-        <circle cx="12" cy="12" r="4" />
-        <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" />
-      </svg>
-    </button>
+    <div class="corner">
+      {
+        hasVideos && (
+          <a class="corner-link" href="/videos/" aria-label="Videos" title="Videos" aria-current={path.startsWith('/videos/') ? 'page' : undefined}>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="14" rx="3" />
+              <path d="M10.5 9.5v5l4.2-2.5Z" />
+            </svg>
+          </a>
+        )
+      }
+      <button class="theme-toggle" type="button" aria-label="Switch to night mode" aria-pressed="false">
+        <svg class="moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />
+        </svg>
+        <svg class="sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" />
+        </svg>
+      </button>
+    </div>
     {
       path !== '/' && (
         <header class:list={[wide ? 'wide' : 'wrap', 'crumb']}>
@@ -116,12 +130,17 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   .skip:focus {
     left: var(--space-2);
   }
-  /* Day/night switch: a small icon in the top-right corner of the window. */
-  .theme-toggle {
+  /* Small icons in the top-right corner of the window: videos, and the day/night switch. */
+  .corner {
     position: fixed;
     top: var(--space-4);
     right: var(--space-4);
     z-index: 5;
+    display: flex;
+    gap: var(--space-1);
+  }
+  .corner-link,
+  .theme-toggle {
     display: grid;
     place-items: center;
     width: 2.5rem;
@@ -134,10 +153,12 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     cursor: pointer;
     transition: color var(--transition);
   }
+  .corner-link:hover,
+  .corner-link[aria-current='page'],
   .theme-toggle:hover {
     color: var(--text);
   }
-  .theme-toggle svg {
+  .corner svg {
     fill: none;
     stroke: currentColor;
     stroke-width: 1.6;
@@ -183,7 +204,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   @media print {
     .crumb,
     .skip,
-    .theme-toggle {
+    .corner {
       display: none;
     }
   }
