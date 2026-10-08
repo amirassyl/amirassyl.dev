@@ -10,6 +10,25 @@
   for (const frame of document.querySelectorAll('.frame[data-video], .frame[data-file]')) {
     const preview = frame.querySelector('video');
 
+    // The lifted tile leans toward the cursor: the spot under the pointer is the high point.
+    if (canHover && !lessMotion) {
+      const MAX_TILT = 8; // degrees at the very edge of the tile
+      frame.addEventListener('pointermove', (event) => {
+        const box = frame.getBoundingClientRect();
+        const x = (event.clientX - box.left) / box.width - 0.5; // -0.5 (left) to 0.5 (right)
+        const y = (event.clientY - box.top) / box.height - 0.5; // -0.5 (top) to 0.5 (bottom)
+        frame.style.setProperty('--ry', `${(-x * 2 * MAX_TILT).toFixed(2)}deg`);
+        frame.style.setProperty('--rx', `${(y * 2 * MAX_TILT).toFixed(2)}deg`);
+        frame.classList.add('steering');
+      });
+      frame.addEventListener('pointerleave', () => {
+        // Hand back to the stylesheet so the tile settles with its normal ease.
+        frame.classList.remove('steering');
+        frame.style.removeProperty('--rx');
+        frame.style.removeProperty('--ry');
+      });
+    }
+
     // Hover preview: muted, so browsers allow it without a click.
     if (preview && canHover && !lessMotion) {
       frame.addEventListener('pointerenter', () => {

@@ -30,10 +30,10 @@ export interface Video {
 
 export const videos: Video[] = [
   { title: 'Miami', year: 2026, file: 'miami' },
-  { title: 'Paper cutouts', year: 2026, file: 'paper-cutout-effect', note: 'Family photos, cut out and set in motion.' },
-  { title: 'Circles', year: 2026, file: 'circle-effect', note: "Friends' selfies, multiplying in circles." },
-  { title: 'Almaty to San Francisco', year: 2025, youtube: 'https://youtu.be/cc36LDgcT_Q', note: 'A travel film, shot ultrawide.' },
-  { title: 'Continuum', year: 2026, youtube: 'https://youtu.be/RtNOG1S8TjQ', note: 'Minerva classmates look back on a year in San Francisco.' },
-  { title: "Seniors' song", year: 2025, file: 'sofa-and-ilyas', vertical: true, note: 'Sofa and Ilyas, NIS PhM Astana class of 2025.' },
-  { title: 'Paradise on Earth', year: 2024, file: 'rai-na-zemle', vertical: true, note: 'A trip to Malaysia. In Russian.' },
+  { title: 'Paper cutouts', year: 2026, file: 'paper-cutout-effect' },
+  { title: 'Animated circles', year: 2026, file: 'circle-effect' },
+  { title: 'Astana to San Francisco', year: 2025, youtube: 'https://youtu.be/cc36LDgcT_Q' },
+  { title: 'Continuum', year: 2026, youtube: 'https://youtu.be/RtNOG1S8TjQ' },
+  { title: "Seniors' song", year: 2025, file: 'sofa-and-ilyas', vertical: true },
+  { title: 'Paradise on Earth', year: 2024, file: 'rai-na-zemle', vertical: true },
 ];

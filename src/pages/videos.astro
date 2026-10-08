@@ -16,7 +16,7 @@ const scriptVersion = fileVersion('public/videos.js');
   <section class="wide page">
     <header class="intro">
       <h1>Videos</h1>
-      <p class="muted">Things I've edited. Hover for a preview, click to watch with sound.</p>
+      <p class="muted">Edited in Final Cut Pro and After Effects. Hover for a preview, click to watch with sound.</p>
     </header>
 
     {
@@ -104,17 +104,27 @@ const scriptVersion = fileVersion('public/videos.js');
       transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.2),
       box-shadow 0.45s ease;
   }
-  /* Hover: the sheet lifts off the table. It rises, tips back a little, and its
-     shadow drops away and softens underneath. Neighbours tip opposite ways. */
+  /* Hover: the sheet lifts off the table and its shadow drops away underneath.
+     videos.js tilts it toward the cursor through --rx and --ry, as if the cursor
+     were picking it up at that point. Without the script it tips back a little,
+     and neighbours lean opposite ways. */
   .frame:hover,
   .frame:focus-visible {
-    transform: perspective(60rem) translateY(-0.7rem) rotateX(5deg) rotate(var(--tilt, -0.9deg)) scale(1.02);
+    transform: perspective(60rem) translateY(-0.7rem) rotateX(var(--rx, 5deg)) rotateY(var(--ry, 0deg))
+      rotate(var(--tilt, -0.9deg)) scale(1.02);
     box-shadow:
       0 1.6rem 1.8rem -1rem rgb(0 0 0 / 0.32),
       0 0.6rem 0.8rem -0.5rem rgb(0 0 0 / 0.18);
   }
   li:nth-child(even) .frame {
     --tilt: 0.9deg;
+  }
+  /* While the cursor is steering the tilt, follow it quickly and drop the fixed lean. */
+  .frame:global(.steering) {
+    --tilt: 0deg;
+    transition:
+      transform 0.14s ease-out,
+      box-shadow 0.45s ease;
   }
   @media (prefers-reduced-motion: reduce) {
     .frame {
