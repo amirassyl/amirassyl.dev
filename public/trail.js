@@ -41,8 +41,10 @@
   const MORPH_SPEED = 9; // how fast a dot turns into an emoji and back, per second
 
   // Over the name (an element with data-me) the dots gather into one round photo.
-  const PORTRAIT_RADIUS = 34; // px
-  const PORTRAIT_DISTANCE = 76; // px from the cursor to the photo's centre
+  const PORTRAIT_RADIUS = 42; // px
+  const PORTRAIT_GAP = 22; // px between the photo and the left edge of the name
+  // Where there is no room on the left (narrow windows), the photo sits beside the cursor instead:
+  const PORTRAIT_DISTANCE = 84; // px from the cursor to the photo's centre
   const PORTRAIT_ANGLE = -0.95; // radians; negative is up and to the right, clear of the name and the text below
 
   // Nothing for people who ask for less motion, or on devices without a mouse.
@@ -104,6 +106,7 @@
     portrait.src = portraitUrl;
   }
   let face = 0; // 0 = plain dots, 1 = the photo fully shown
+  let portraitHome = null; // the photo's spot left of the name, or null when there is no room there
   let shownPlace = null; // the place whose emoji is on screen, kept while it morphs back
   let morph = 0; // 0 = plain dots, 1 = fully emoji
   // Dots show while the pointer is on the page and the mouse button is up,
@@ -189,10 +192,15 @@
       x: pointer.x + Math.cos(angle) * distance + Math.sin(time * dot.driftX + dot.phase) * DRIFT,
       y: pointer.y + Math.sin(angle) * distance + Math.cos(time * dot.driftY + dot.phase) * DRIFT,
     };
-    // The first dot carries the photo: over the name it moves out to a fixed spot beside the cursor.
+    // The first dot carries the photo: over the name it moves to the left of the
+    // name and stays there, however the cursor moves along the word.
     if (dot === dots[0] && face > 0) {
-      spot.x += (pointer.x + Math.cos(PORTRAIT_ANGLE) * PORTRAIT_DISTANCE - spot.x) * face;
-      spot.y += (pointer.y + Math.sin(PORTRAIT_ANGLE) * PORTRAIT_DISTANCE - spot.y) * face;
+      const home = portraitHome || {
+        x: pointer.x + Math.cos(PORTRAIT_ANGLE) * PORTRAIT_DISTANCE,
+        y: pointer.y + Math.sin(PORTRAIT_ANGLE) * PORTRAIT_DISTANCE,
+      };
+      spot.x += (home.x - spot.x) * face;
+      spot.y += (home.y - spot.y) * face;
     }
     return spot;
   }
@@ -327,7 +335,14 @@
       pointer.overMedia = event.target instanceof Element && event.target.closest('.frame, dialog') !== null;
       const placeName = event.target instanceof Element ? event.target.closest('[data-place]') : null;
       pointer.place = placeName ? placeName.dataset.place : null;
-      pointer.me = event.target instanceof Element && event.target.closest('[data-me]') !== null;
+      const nameElement = event.target instanceof Element ? event.target.closest('[data-me]') : null;
+      pointer.me = nameElement !== null;
+      if (nameElement) {
+        // Left of the name, level with it; kept while the photo fades after leaving.
+        const box = nameElement.getBoundingClientRect();
+        const x = box.left - PORTRAIT_GAP - PORTRAIT_RADIUS;
+        portraitHome = x - PORTRAIT_RADIUS >= 8 ? { x, y: box.top + box.height / 2 } : null;
+      }
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       // On the first move, or when coming back after fading out, start the dots at their spots.
