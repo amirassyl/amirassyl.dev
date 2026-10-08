@@ -41,3 +41,5 @@
   Cache-Control: public, max-age=3600
 /Amirassyl-Sagyndyk-CV.pdf
   Cache-Control: public, max-age=3600
+/me.jpg
+  Cache-Control: public, max-age=86400

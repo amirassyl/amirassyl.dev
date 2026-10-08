@@ -7,6 +7,8 @@
 // cursor (see springyEmojiCursor in github.com/tholman/cursor-effects), with a
 // separate resting spot per dot instead of a chain.
 (() => {
+  // The photo's address is passed in on this script's own tag, so it carries a version.
+  const portraitUrl = document.currentScript ? document.currentScript.dataset.portrait : null;
   const COLORS = ['#F2AF29', '#3B82F6', '#FF4D4D', '#FFB703', '#4ADE80']; // marigold, blue, red, amber, green
   const COUNT = [5, 10]; // how many dots: a random whole number in this range, picked on each page load
   const MIN_RADIUS = 3.5;
@@ -38,6 +40,11 @@
   const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
   const MORPH_SPEED = 9; // how fast a dot turns into an emoji and back, per second
 
+  // Over the name (an element with data-me) the dots gather into one round photo.
+  const PORTRAIT_RADIUS = 34; // px
+  const PORTRAIT_DISTANCE = 76; // px from the cursor to the photo's centre
+  const PORTRAIT_ANGLE = -0.95; // radians; negative is up and to the right, clear of the name and the text below
+
   // Nothing for people who ask for less motion, or on devices without a mouse.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -55,8 +62,10 @@
   // Mix with the page so text stays readable through a dot: like ink on the
   // light page, like light on the dark one. Follows the day/night switch.
   const root = document.documentElement;
+  // A photo is drawn as it is, without mixing, so `plain` switches the mixing off while one shows.
+  let plain = false;
   const blend = () => {
-    canvas.style.mixBlendMode = root.dataset.theme === 'dark' ? 'screen' : 'multiply';
+    canvas.style.mixBlendMode = plain ? 'normal' : root.dataset.theme === 'dark' ? 'screen' : 'multiply';
   };
   blend();
   new MutationObserver(blend).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
@@ -65,7 +74,7 @@
   if (!ctx) return;
 
   const random = (min, max) => min + Math.random() * (max - min);
-  const pointer = { x: 0, y: 0, inside: false, seen: false, pressed: false, overText: false, overMedia: false, place: null };
+  const pointer = { x: 0, y: 0, inside: false, seen: false, pressed: false, overText: false, overMedia: false, place: null, me: false };
 
   // Does this browser draw the emoji as a colour picture? Draw it small and look for coloured pixels.
   function drawsInColour(emoji) {
@@ -86,6 +95,15 @@
     return false;
   }
   for (const place of Object.values(PLACES)) place.asEmoji = drawsInColour(place.emoji);
+  const portrait = new Image();
+  let portraitReady = false;
+  if (portraitUrl) {
+    portrait.onload = () => {
+      portraitReady = true;
+    };
+    portrait.src = portraitUrl;
+  }
+  let face = 0; // 0 = plain dots, 1 = the photo fully shown
   let shownPlace = null; // the place whose emoji is on screen, kept while it morphs back
   let morph = 0; // 0 = plain dots, 1 = fully emoji
   // Dots show while the pointer is on the page and the mouse button is up,
@@ -167,10 +185,16 @@
   function restingSpot(dot) {
     const angle = dot.angle + time * ORBIT_SPEED;
     const distance = dot.distance * (1 + (PLACE_SPREAD - 1) * morph);
-    return {
+    const spot = {
       x: pointer.x + Math.cos(angle) * distance + Math.sin(time * dot.driftX + dot.phase) * DRIFT,
       y: pointer.y + Math.sin(angle) * distance + Math.cos(time * dot.driftY + dot.phase) * DRIFT,
     };
+    // The first dot carries the photo: over the name it moves out to a fixed spot beside the cursor.
+    if (dot === dots[0] && face > 0) {
+      spot.x += (pointer.x + Math.cos(PORTRAIT_ANGLE) * PORTRAIT_DISTANCE - spot.x) * face;
+      spot.y += (pointer.y + Math.sin(PORTRAIT_ANGLE) * PORTRAIT_DISTANCE - spot.y) * face;
+    }
+    return spot;
   }
 
   function step(dt) {
@@ -226,7 +250,14 @@
     }
 
     // Over a place name the dots stay at full strength so the flag is clear.
-    const target = visible() ? (pointer.place ? 1 : pointer.overText ? TEXT_OPACITY : 1) : 0;
+    const showFace = pointer.me && portraitReady;
+    face += ((showFace ? 1 : 0) - face) * Math.min(1, elapsed * MORPH_SPEED);
+    if (face < 0.01) face = 0;
+    if (plain !== face > 0) {
+      plain = face > 0;
+      blend();
+    }
+    const target = visible() ? (pointer.place || showFace ? 1 : pointer.overText ? TEXT_OPACITY : 1) : 0;
     if (pointer.place) shownPlace = PLACES[pointer.place] || null;
     morph += ((pointer.place && shownPlace ? 1 : 0) - morph) * Math.min(1, elapsed * MORPH_SPEED);
     if (morph < 0.01) morph = 0;
@@ -240,7 +271,8 @@
       // the emoji grows in its place; the others simply shrink out of sight. Where
       // emoji cannot be drawn, the few that stay keep their shape and take the place's colour.
       const stays = kept.has(i);
-      const dotScale = asEmoji || !stays ? 1 - morph : 1;
+      // Over the name every plain dot shrinks away, leaving only the photo.
+      const dotScale = (asEmoji || !stays ? 1 - morph : 1) * (1 - face);
       if (dotScale > 0.02) {
         const recolour = stays && morph > 0.5 && shownPlace && !shownPlace.asEmoji;
         ctx.fillStyle = recolour ? shownPlace.colors[i % shownPlace.colors.length] : dot.color;
@@ -255,6 +287,17 @@
         ctx.fillText(shownPlace.emoji, dot.x, dot.y);
       }
     });
+    if (face > 0) {
+      // The photo, cut to a circle, growing out of the first dot.
+      const dot = dots[0];
+      const radius = dot.radius + (PORTRAIT_RADIUS - dot.radius) * face;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(portrait, dot.x - radius, dot.y - radius, radius * 2, radius * 2);
+      ctx.restore();
+    }
     ctx.globalAlpha = 1;
 
     // Stop drawing once the dots are hidden and have faded out.
@@ -284,6 +327,7 @@
       pointer.overMedia = event.target instanceof Element && event.target.closest('.frame, dialog') !== null;
       const placeName = event.target instanceof Element ? event.target.closest('[data-place]') : null;
       pointer.place = placeName ? placeName.dataset.place : null;
+      pointer.me = event.target instanceof Element && event.target.closest('[data-me]') !== null;
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       // On the first move, or when coming back after fading out, start the dots at their spots.

@@ -33,6 +33,7 @@ const image = new URL(defaultImage.path, origin);
 const trailVersion = fileVersion('public/trail.js');
 const rippleVersion = fileVersion('public/ripple.js');
 const themeVersion = fileVersion('public/theme.js');
+const portraitVersion = fileVersion('public/me.jpg');
 const hasVideos = videos.length > 0;
 const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [personSchema(origin)] : [];
 ---
@@ -116,7 +117,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     <main id="main">
       <slot />
     </main>
-    <script is:inline defer src={`/trail.js?v=${trailVersion}`}></script>
+    <script is:inline defer src={`/trail.js?v=${trailVersion}`} data-portrait={`/me.jpg?v=${portraitVersion}`}></script>
     <script is:inline defer src={`/ripple.js?v=${rippleVersion}`}></script>
     <slot name="scripts" />
   </body>
