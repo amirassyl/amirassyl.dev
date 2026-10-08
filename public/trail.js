@@ -45,10 +45,11 @@
   if (!ctx) return;
 
   const random = (min, max) => min + Math.random() * (max - min);
-  const pointer = { x: 0, y: 0, inside: false, seen: false, pressed: false, overText: false };
+  const pointer = { x: 0, y: 0, inside: false, seen: false, pressed: false, overText: false, overMedia: false };
   // Dots show while the pointer is on the page and the mouse button is up,
-  // so they get out of the way while text is being selected.
-  const visible = () => pointer.inside && !pointer.pressed;
+  // so they get out of the way while text is being selected. They also stay
+  // off video tiles and the video player.
+  const visible = () => pointer.inside && !pointer.pressed && !pointer.overMedia;
 
   // Is there a letter under (or right next to) this point? Asks the browser which
   // character a click here would land on, then checks the point is really on it.
@@ -212,6 +213,7 @@
     (event) => {
       if (event.pointerType !== 'mouse') return;
       pointer.overText = isOverText(event.clientX, event.clientY);
+      pointer.overMedia = event.target instanceof Element && event.target.closest('.frame, dialog') !== null;
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       // On the first move, or when coming back after fading out, start the dots at their spots.

@@ -11,9 +11,13 @@ export function youtubeId(input: string): string {
 }
 
 export interface VideoTile extends Video {
+  /** The YouTube video ID, or the file name for a video hosted here. */
   id: string;
+  /** Where the tile links to without JavaScript: YouTube, or the full video file. */
   watchUrl: string;
-  /** Still image: the saved frame if a clip was made, otherwise YouTube's thumbnail. */
+  /** The full video file, for videos hosted on this site. */
+  full?: string;
+  /** Still image: the saved frame if there is one, otherwise YouTube's thumbnail. */
   poster: string;
   /** Silent hover preview, if one has been made with `npm run clip`. */
   clip?: string;
@@ -21,15 +25,28 @@ export interface VideoTile extends Video {
 
 export function getVideos(): VideoTile[] {
   return videos.map((video) => {
+    const where = `src/data/videos.ts: "${video.title}"`;
+    if (video.youtube && video.file) throw new Error(`${where} has both youtube and file; keep one`);
+
+    if (video.file) {
+      const id = video.file;
+      for (const name of [`${id}-full.mp4`, `${id}.mp4`, `${id}.jpg`]) {
+        if (!existsSync(`public/clips/${name}`)) {
+          throw new Error(`${where}: public/clips/${name} is missing. Run: npm run clip -- --name ${id} --file <video file>`);
+        }
+      }
+      const full = `/clips/${id}-full.mp4`;
+      return { ...video, id, watchUrl: full, full, poster: `/clips/${id}.jpg`, clip: `/clips/${id}.mp4` };
+    }
+
+    if (!video.youtube) throw new Error(`${where} needs either youtube or file`);
     const id = youtubeId(video.youtube);
-    const hasClip = existsSync(`public/clips/${id}.mp4`);
-    const hasFrame = existsSync(`public/clips/${id}.jpg`);
     return {
       ...video,
       id,
       watchUrl: `https://www.youtube.com/watch?v=${id}`,
-      poster: hasFrame ? `/clips/${id}.jpg` : `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
-      clip: hasClip ? `/clips/${id}.mp4` : undefined,
+      poster: existsSync(`public/clips/${id}.jpg`) ? `/clips/${id}.jpg` : `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+      clip: existsSync(`public/clips/${id}.mp4`) ? `/clips/${id}.mp4` : undefined,
     };
   });
 }

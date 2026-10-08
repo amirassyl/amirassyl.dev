@@ -21,7 +21,7 @@ const scriptVersion = fileVersion('public/videos.js');
         <ul class="grid">
           {videos.map((video) => (
             <li>
-              <a class="frame" href={video.watchUrl} data-video={video.id} data-title={video.title} rel="noopener">
+              <a class="frame" href={video.watchUrl} data-video={video.full ? undefined : video.id} data-file={video.full} data-title={video.title} rel="noopener">
                 <img src={video.poster} alt="" width="640" height="360" loading="lazy" decoding="async" />
                 {video.clip && (
                   <video src={video.clip} muted loop playsinline preload="none" tabindex="-1" aria-hidden="true" />
@@ -40,7 +40,7 @@ const scriptVersion = fileVersion('public/videos.js');
     }
   </section>
 
-  {/* The full video plays here, from YouTube, after a click. */}
+  {/* The full video plays here after a click: from YouTube, or from this site for hosted files. */}
   <dialog class="player" aria-label="Video player">
     <button class="close" type="button">Close</button>
     <div class="stage"></div>
@@ -132,7 +132,8 @@ const scriptVersion = fileVersion('public/videos.js');
     border-radius: var(--radius);
     overflow: hidden;
   }
-  .stage :global(iframe) {
+  .stage :global(iframe),
+  .stage :global(video) {
     display: block;
     width: 100%;
     height: 100%;
