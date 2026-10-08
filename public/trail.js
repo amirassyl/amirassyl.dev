@@ -14,8 +14,8 @@
   const MIN_DISTANCE = 14; // px from the pointer, so no dot sits under it
   const MAX_DISTANCE = 22;
   const STIFFNESS = [170, 250]; // spring pull; higher follows the cursor more tightly
-  const DAMPING = [5.5, 8]; // resistance; lower is bouncier
-  const DRIFT = 3; // px each dot wanders around its spot while the cursor is still
+  const DAMPING = [8, 12]; // resistance; lower is bouncier; higher values reduce post-movement wobble
+  const DRIFT = 2; // px each dot wanders around its spot while the cursor is still
   const DRIFT_SPEED = [0.5, 1.1]; // wander cycles, in radians per second
   const ORBIT_SPEED = 0.12; // slow rotation of the whole group, radians per second
   const REPEL_STRENGTH = 30000; // how hard nearby dots push each other apart; 0 turns it off
