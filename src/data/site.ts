@@ -12,6 +12,7 @@ export const site = {
   links: {
     github: 'https://github.com/amirassyl',
     linkedin: 'https://www.linkedin.com/in/amirassyl',
+    telergam: 'https://t.me/amirassyl'
   },
   status: 'Open to software engineering internships, summer 2027',
 };
