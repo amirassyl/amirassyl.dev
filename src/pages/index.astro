@@ -25,16 +25,18 @@ const hasVideos = videos.length > 0;
           <Ripple text="@Minerva University" />
         </a>
         , and I move countries every year. This year
-        that's Japan, and I'm currently in Tokyo.
+        that's <span class="place" data-place="jp">Japan</span>, and I'm currently in{' '}
+        <span class="place" data-place="jp">Tokyo</span>.
       </p>
       <p>
         Last year I built the front end of an exhibit prototype for the Exploratorium. 
         It talks you through your emotions (<a href="https://elevenlabs.io/conversational-ai" rel="noopener" aria-label="@ElevenLabs" data-ripple><Ripple text="@ElevenLabs" /></a>), 
         and then guides you through yoga poses (<a href="https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker" rel="noopener" aria-label="@MediaPipe" data-ripple><Ripple text="@MediaPipe" /></a>). 
-        Before that I wrote C++ for a robotics team in Kazakhstan, where I'm from.
+        Before that I wrote C++ for a robotics team in <span class="place" data-place="kz">Kazakhstan</span>, where I'm from.
       </p>
       <p>
-        I'm looking for a software engineering internship for summer 2027. I'll be in San Francisco, and anywhere
+        I'm looking for a software engineering internship for summer 2027. I'll be in{' '}
+        <span class="place" data-place="sf">San Francisco</span>, and anywhere
         in the US works.
       </p>
     </div>
@@ -90,6 +92,22 @@ const hasVideos = videos.length > 0;
     margin-bottom: var(--space-5);
     width: fit-content;
     cursor: default;
+  }
+  /* Place names take their place's colour when pointed at; trail.js turns the
+     cursor dots into the matching flag (or bridge) at the same time. */
+  .place {
+    cursor: default;
+    white-space: nowrap; /* keep a two-word name on one line, so it is one hover target */
+    transition: color 0.25s ease;
+  }
+  .place[data-place='kz']:hover {
+    color: var(--place-kz);
+  }
+  .place[data-place='jp']:hover {
+    color: var(--place-jp);
+  }
+  .place[data-place='sf']:hover {
+    color: var(--place-sf);
   }
   .intro p:last-child {
     margin-bottom: 0;

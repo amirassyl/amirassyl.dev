@@ -20,6 +20,11 @@
   --ripple-time: 720ms;
   --ripple-big-scale: 1.34; /* the name */
 
+  /* Place names on hover: Kazakh sky blue, Japanese red, Golden Gate orange */
+  --place-kz: #0094b3; /* a little deeper than the flag's blue so it reads on the light page */
+  --place-jp: #bc002d;
+  --place-sf: #c0362c;
+
   /* Dotted page background */
   --dot: #c2c2b9;
   --dot-size: 1px;
@@ -93,6 +98,9 @@
   --accent-ink: #0b1020;
   --sheen: #6c6e78; /* at night the sheen is a dimmer band passing over the letters */
   --dot: #34343b;
+  --place-kz: #00afca; /* the flag's own blue */
+  --place-jp: #ff5a76;
+  --place-sf: #f26a4b;
   color-scheme: dark;
 }
 

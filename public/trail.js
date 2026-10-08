@@ -24,6 +24,18 @@
   const TEXT_MARGIN = 6; // px around a letter that still counts as being over text
   const FADE_SPEED = 10; // how fast the dots appear and disappear, per second
 
+  // Over a place name (an element with data-place) the dots turn into that place's emoji.
+  // `colors` is the fallback where the emoji cannot be drawn in colour: Windows shows
+  // flag emoji as two letters, so there the dots just take the flag's colours.
+  const PLACES = {
+    kz: { emoji: '🇰🇿', colors: ['#00AFCA', '#FEC50C'] },
+    jp: { emoji: '🇯🇵', colors: ['#BC002D'] },
+    sf: { emoji: '🌉', colors: ['#C0362C'] },
+  };
+  const EMOJI_SIZE = 18; // px
+  const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+  const MORPH_SPEED = 9; // how fast a dot turns into an emoji and back, per second
+
   // Nothing for people who ask for less motion, or on devices without a mouse.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -51,7 +63,29 @@
   if (!ctx) return;
 
   const random = (min, max) => min + Math.random() * (max - min);
-  const pointer = { x: 0, y: 0, inside: false, seen: false, pressed: false, overText: false, overMedia: false };
+  const pointer = { x: 0, y: 0, inside: false, seen: false, pressed: false, overText: false, overMedia: false, place: null };
+
+  // Does this browser draw the emoji as a colour picture? Draw it small and look for coloured pixels.
+  function drawsInColour(emoji) {
+    const probe = document.createElement('canvas');
+    probe.width = probe.height = 32;
+    const pen = probe.getContext('2d', { willReadFrequently: true });
+    if (!pen) return false;
+    pen.font = `24px ${EMOJI_FONT}`;
+    pen.textAlign = 'center';
+    pen.textBaseline = 'middle';
+    pen.fillStyle = '#000';
+    pen.fillText(emoji, 16, 16);
+    const pixels = pen.getImageData(0, 0, 32, 32).data;
+    for (let i = 0; i < pixels.length; i += 4) {
+      const spread = Math.max(pixels[i], pixels[i + 1], pixels[i + 2]) - Math.min(pixels[i], pixels[i + 1], pixels[i + 2]);
+      if (pixels[i + 3] > 60 && spread > 50) return true;
+    }
+    return false;
+  }
+  for (const place of Object.values(PLACES)) place.asEmoji = drawsInColour(place.emoji);
+  let shownPlace = null; // the place whose emoji is on screen, kept while it morphs back
+  let morph = 0; // 0 = plain dots, 1 = fully emoji
   // Dots show while the pointer is on the page and the mouse button is up,
   // so they get out of the way while text is being selected. They also stay
   // off video tiles and the video player.
@@ -182,17 +216,34 @@
       step(Math.min(remaining, 1 / 240));
     }
 
-    const target = visible() ? (pointer.overText ? TEXT_OPACITY : 1) : 0;
+    // Over a place name the dots stay at full strength so the flag is clear.
+    const target = visible() ? (pointer.place ? 1 : pointer.overText ? TEXT_OPACITY : 1) : 0;
+    if (pointer.place) shownPlace = PLACES[pointer.place] || null;
+    morph += ((pointer.place && shownPlace ? 1 : 0) - morph) * Math.min(1, elapsed * MORPH_SPEED);
+    if (morph < 0.01) morph = 0;
     opacity += (target - opacity) * Math.min(1, elapsed * FADE_SPEED);
 
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     ctx.globalAlpha = opacity;
-    for (const dot of dots) {
-      ctx.fillStyle = dot.color;
-      ctx.beginPath();
-      ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    const asEmoji = morph > 0 && shownPlace && shownPlace.asEmoji;
+    dots.forEach((dot, i) => {
+      // The plain dot shrinks away as the emoji grows in its place. Where emoji
+      // cannot be drawn, the dot keeps its shape and takes the place's colour.
+      const dotScale = asEmoji ? 1 - morph : 1;
+      if (dotScale > 0.02) {
+        const recolour = morph > 0.5 && shownPlace && !shownPlace.asEmoji;
+        ctx.fillStyle = recolour ? shownPlace.colors[i % shownPlace.colors.length] : dot.color;
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.radius * dotScale, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (asEmoji) {
+        ctx.font = `${(EMOJI_SIZE * morph).toFixed(1)}px ${EMOJI_FONT}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(shownPlace.emoji, dot.x, dot.y);
+      }
+    });
     ctx.globalAlpha = 1;
 
     // Stop drawing once the dots are hidden and have faded out.
@@ -220,6 +271,8 @@
       if (event.pointerType !== 'mouse') return;
       pointer.overText = isOverText(event.clientX, event.clientY);
       pointer.overMedia = event.target instanceof Element && event.target.closest('.frame, dialog') !== null;
+      const placeName = event.target instanceof Element ? event.target.closest('[data-place]') : null;
+      pointer.place = placeName ? placeName.dataset.place : null;
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       // On the first move, or when coming back after fading out, start the dots at their spots.
