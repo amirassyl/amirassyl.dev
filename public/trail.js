@@ -35,13 +35,18 @@
     height: '100%',
     pointerEvents: 'none',
     zIndex: '9999',
+    // Mix with the page like ink, so text stays readable through a dot.
+    mixBlendMode: 'multiply',
   });
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
   const random = (min, max) => min + Math.random() * (max - min);
-  const pointer = { x: 0, y: 0, inside: false, seen: false };
+  const pointer = { x: 0, y: 0, inside: false, seen: false, pressed: false };
+  // Dots show while the pointer is on the page and the mouse button is up,
+  // so they get out of the way while text is being selected.
+  const visible = () => pointer.inside && !pointer.pressed;
   let opacity = 0;
   let frame = 0;
   let last = 0;
@@ -134,7 +139,7 @@
       step(Math.min(remaining, 1 / 240));
     }
 
-    const target = pointer.inside ? 1 : 0;
+    const target = visible() ? 1 : 0;
     opacity += (target - opacity) * Math.min(1, elapsed * FADE_SPEED);
 
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -147,8 +152,8 @@
     }
     ctx.globalAlpha = 1;
 
-    // Stop drawing once the pointer has left and the dots have faded out.
-    if (!pointer.inside && opacity < 0.01) {
+    // Stop drawing once the dots are hidden and have faded out.
+    if (!visible() && opacity < 0.01) {
       opacity = 0;
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       frame = 0;
@@ -193,4 +198,16 @@
   document.documentElement.addEventListener('pointerleave', () => {
     pointer.inside = false;
   });
+
+  // Hide while the main mouse button is held (dragging a selection), and come back on release.
+  window.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse' && event.button === 0) pointer.pressed = true;
+  });
+  const release = () => {
+    pointer.pressed = false;
+    if (pointer.inside) start();
+  };
+  window.addEventListener('pointerup', release);
+  window.addEventListener('pointercancel', release);
+  window.addEventListener('blur', release);
 })();
