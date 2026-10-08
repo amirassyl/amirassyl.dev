@@ -81,9 +81,25 @@
   color-scheme: light;
 }
 
+/* Night mode: the same tokens with dark values. theme.js sets data-theme on <html>. */
+:root[data-theme='dark'] {
+  --bg: #111113;
+  --surface: #1c1c20;
+  --line: #2b2b30;
+  --text: #ececea;
+  --muted: #9a9aa2;
+  --underline: #4b4b53;
+  --accent: #93b4ff;
+  --accent-ink: #0b1020;
+  --sheen: #6c6e78; /* at night the sheen is a dimmer band passing over the letters */
+  --dot: #34343b;
+  color-scheme: dark;
+}
+
 /* Print is always black on white, without the dots. */
 @media print {
-  :root {
+  :root,
+  :root[data-theme='dark'] {
     --bg: #fff;
     --surface: #fff;
     --line: #999;
@@ -95,6 +111,23 @@
     --dot: transparent;
     color-scheme: light;
   }
+}
+
+/*
+ * Switching between day and night: theme.js reveals the new colours with a
+ * circle growing from the button, so the browser's default cross-fade is off.
+ * Going back to day, the night picture stays on top and shrinks into the button.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+.theme-shrinking::view-transition-old(root) {
+  z-index: 2;
+}
+.theme-shrinking::view-transition-new(root) {
+  z-index: 1;
 }
 
 *,

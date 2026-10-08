@@ -37,3 +37,5 @@
 # Preview clips and their still frames; the file name is the YouTube video ID.
 /clips/*
   Cache-Control: public, max-age=86400
+/theme.js
+  Cache-Control: public, max-age=3600

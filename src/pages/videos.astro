@@ -116,6 +116,13 @@ const scriptVersion = fileVersion('public/videos.js');
       0 1.6rem 1.8rem -1rem rgb(0 0 0 / 0.32),
       0 0.6rem 0.8rem -0.5rem rgb(0 0 0 / 0.18);
   }
+  /* At night a shadow cannot be seen, so a lifted sheet also catches a faint light on its edge. */
+  :global([data-theme='dark']) .frame:hover,
+  :global([data-theme='dark']) .frame:focus-visible {
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.16),
+      0 1.6rem 2rem -1rem rgb(0 0 0 / 0.8);
+  }
   li:nth-child(even) .frame {
     --tilt: 0.9deg;
   }

@@ -31,6 +31,7 @@ const image = new URL(defaultImage.path, origin);
 // The script URL carries a hash of the file, so browsers fetch a new copy whenever it changes.
 const trailVersion = fileVersion('public/trail.js');
 const rippleVersion = fileVersion('public/ripple.js');
+const themeVersion = fileVersion('public/theme.js');
 const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [personSchema(origin)] : [];
 ---
 
@@ -61,10 +62,21 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     <meta name="twitter:image:alt" content={defaultImage.alt} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#fcfcfa" />
+    {/* Not deferred on purpose: it picks day or night before the page is first drawn. */}
+    <script is:inline src={`/theme.js?v=${themeVersion}`}></script>
     {jsonLd.map((data) => <script is:inline type="application/ld+json" set:html={serializeJsonLd(data)} />)}
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
+    <button class="theme-toggle" type="button" aria-label="Switch to night mode" aria-pressed="false">
+      <svg class="moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />
+      </svg>
+      <svg class="sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" />
+      </svg>
+    </button>
     {
       path !== '/' && (
         <header class:list={[wide ? 'wide' : 'wrap', 'crumb']}>
@@ -104,6 +116,42 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   .skip:focus {
     left: var(--space-2);
   }
+  /* Day/night switch: a small icon in the top-right corner of the window. */
+  .theme-toggle {
+    position: fixed;
+    top: var(--space-4);
+    right: var(--space-4);
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color var(--transition);
+  }
+  .theme-toggle:hover {
+    color: var(--text);
+  }
+  .theme-toggle svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Show the moon by day (press for night) and the sun by night. */
+  .theme-toggle .sun,
+  :global([data-theme='dark']) .theme-toggle .moon {
+    display: none;
+  }
+  :global([data-theme='dark']) .theme-toggle .sun {
+    display: block;
+  }
   /* Inner pages get one quiet line back to the home page instead of a menu bar. */
   .crumb {
     padding-top: var(--space-page);
@@ -134,7 +182,8 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   }
   @media print {
     .crumb,
-    .skip {
+    .skip,
+    .theme-toggle {
       display: none;
     }
   }

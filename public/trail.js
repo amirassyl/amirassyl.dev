@@ -37,9 +37,15 @@
     height: '100%',
     pointerEvents: 'none',
     zIndex: '9999',
-    // Mix with the page like ink, so text stays readable through a dot.
-    mixBlendMode: 'multiply',
   });
+  // Mix with the page so text stays readable through a dot: like ink on the
+  // light page, like light on the dark one. Follows the day/night switch.
+  const root = document.documentElement;
+  const blend = () => {
+    canvas.style.mixBlendMode = root.dataset.theme === 'dark' ? 'screen' : 'multiply';
+  };
+  blend();
+  new MutationObserver(blend).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
