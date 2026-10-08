@@ -14,13 +14,14 @@ const posts = (await getPosts()).slice(0, 5);
     <h1 class="name">{site.shortName}</h1>
     <div class="intro">
       <p>
-        I study Computational Sciences at Minerva University, which moves to a new country every year. This year
-        that's Japan, and I live in Tokyo.
+        I study Computational Sciences at Minerva University, and I move countries every year. This year
+        that's 🇯🇵Japan, and I'm currently in Tokyo.
       </p>
       <p>
-        Last year I built the front end of an exhibit prototype for the Exploratorium. It tracks your pose through
-        the camera and a voice guide talks you through it. Before that I wrote C++ for a robotics team in
-        Kazakhstan, where I'm from.
+        Last year I built the front end of an exhibit prototype for the Exploratorium. 
+        It talks you through your emotions (<a href="https://elevenlabs.io/conversational-ai">@ElevenLabs</a>), 
+        and then guides you through yoga poses (<a href="https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker">@MediaPipe)</a>. 
+        Before that I wrote C++ for a robotics team in 🇰🇿Kazakhstan, where I'm from.
       </p>
       <p>
         I'm looking for a software engineering internship for summer 2027. I'll be in San Francisco, and anywhere
@@ -62,9 +63,10 @@ const posts = (await getPosts()).slice(0, 5);
       <h2 class="label">Contact</h2>
       <p>
         Outside of code I play classical guitar and piano. Say hi:{' '}
-        <a href={`mailto:${site.email}`}>{site.email}</a>,{' '}
+        <a href={`mailto:${site.email}`}>Email</a>,{' '}
         <a href={site.links.linkedin} rel="noopener">LinkedIn</a>,{' '}
-        <a href={site.links.github} rel="noopener">GitHub</a>.
+        <a href={site.links.github} rel="noopener">GitHub</a>,{' '}
+        <a href={site.links.telegram} rel="noopener">Telegram</a>.
       </p>
     </section>
   </div>
