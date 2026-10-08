@@ -1,6 +1,6 @@
 ---
 title: Serotonin Pod
-summary: A browser-based wellness experience prototyped for the Exploratorium. You name what you feel, then a voice guide and live pose tracking walk you through a body pose or breathing exercise matched to that emotion.
+summary: "Pose tracking and a voice guide in the browser. Prototype for the Exploratorium."
 metaDescription: "A browser-based wellness experience prototyped for the Exploratorium: a voice guide and live pose tracking walk you through a pose or breathing exercise."
 context: Exploratorium × Minerva civic project
 period: September 2025 – May 2026

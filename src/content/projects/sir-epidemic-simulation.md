@@ -1,6 +1,6 @@
 ---
 title: SIR epidemic simulation
-summary: A numerical simulation of how COVID-19 could spread through Karaganda, Kazakhstan, using the SIR model and Euler's method written from scratch.
+summary: "COVID spread in Karaganda, with Euler's method written from scratch."
 context: Minerva formal analysis course
 period: Spring 2026
 stack: [Python, NumPy, Matplotlib, Jupyter]

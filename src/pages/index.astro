@@ -11,13 +11,22 @@ const posts = (await getPosts()).slice(0, 3);
 
 <Base>
   <section class="hero wrap">
-    <p class="meta">{site.status}</p>
-    <h1>Amirassyl Sagyndyk builds software you can see, hear, and <em>move through</em>.</h1>
-    <p class="lede">
-      I study Computational Sciences at Minerva University, a programme that moves between cities. I'm from
-      Kazakhstan, in Tokyo this semester, and back in San Francisco for summer 2027. I like work where math meets
-      an interface: pose tracking in the browser, numerical solvers written from scratch, real-time 3D.
-    </p>
+    <h1>{site.name}</h1>
+    <div class="lede">
+      <p>
+        I study Computational Sciences at Minerva University, which moves to a new country every year. This year
+        that's Japan, and I live in Tokyo.
+      </p>
+      <p>
+        Last year I built the front end of an exhibit prototype for the Exploratorium. It tracks your pose through
+        the camera and a voice guide talks you through it. Before that I wrote C++ for a robotics team in
+        Kazakhstan, where I'm from.
+      </p>
+      <p>
+        I'm looking for a software engineering internship for summer 2027. I'll be in San Francisco, and anywhere
+        in the US works.
+      </p>
+    </div>
     <div class="actions">
       <a href="/projects/">See projects</a>
       <a href="/resume/">Résumé</a>
@@ -73,11 +82,8 @@ const posts = (await getPosts()).slice(0, 3);
 
   <section class="section">
     <div class="wrap contact">
-      <h2>Get in touch</h2>
-      <p class="muted">
-        I'm looking for a software engineering internship for summer 2027, anywhere in the US. I'm eligible for CPT.
-        The fastest way to reach me is email.
-      </p>
+      <h2>Contact</h2>
+      <p class="muted">Outside of code I play classical guitar and piano. Say hi:</p>
       <div class="actions">
         <a href={`mailto:${site.email}`}>{site.email}</a>
         <a href={site.links.linkedin} rel="noopener">LinkedIn</a>
@@ -94,10 +100,10 @@ const posts = (await getPosts()).slice(0, 3);
   .hero h1 {
     max-width: 20ch;
   }
-  .hero em {
-    font-style: italic;
-  }
   .lede {
     margin-top: var(--space-5);
+  }
+  .lede p:last-child {
+    margin-bottom: 0;
   }
 </style>

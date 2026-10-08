@@ -3,12 +3,12 @@
 export const site = {
   name: 'Amirassyl Sagyndyk',
   shortName: 'Amirassyl',
-  title: 'Amirassyl Sagyndyk — software, simulation, and things that move',
+  title: 'Amirassyl Sagyndyk',
   description:
     'Computational Sciences student at Minerva University. I build interactive web experiences and numerical models. Open to software internships for summer 2027.',
   url: 'https://amirassyl.dev',
   email: 'amirassyl@uni.minerva.edu',
-  location: 'Tokyo this semester · San Francisco from summer 2027',
+  location: 'Tokyo this year · San Francisco for summer 2027',
   links: {
     github: 'https://github.com/amirassyl',
     linkedin: 'https://www.linkedin.com/in/amirassyl',

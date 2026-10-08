@@ -1,6 +1,6 @@
 ---
 title: Breast cancer cell statistics
-summary: Hypothesis testing and linear regression on the Breast Cancer Wisconsin dataset, with the descriptive statistics implemented from scratch.
+summary: "t-tests and regression on 569 biopsies."
 context: Minerva formal analysis courses
 period: Fall 2025 – Spring 2026
 stack: [Python, Pandas, SciPy, statsmodels, Matplotlib]

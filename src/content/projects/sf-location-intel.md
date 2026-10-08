@@ -1,6 +1,6 @@
 ---
 title: SF Location Intel
-summary: A hackathon prototype for a nonprofit newsroom that pulls San Francisco open data about a street into one view, plus a daily email digest of newly registered businesses.
+summary: "Permits, incidents and new businesses for one street. Hackathon build for a newsroom."
 metaDescription: "A hackathon prototype for a nonprofit newsroom: San Francisco open data about a street in one view, plus a daily email digest of newly registered businesses."
 context: Hack for Social Impact 2025
 period: November 2025

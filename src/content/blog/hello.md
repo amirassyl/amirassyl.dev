@@ -5,7 +5,7 @@ date: 2026-10-08
 tags: [meta]
 ---
 
-I'm Amirassyl. I study Computational Sciences at Minerva University, which means I change cities every few months. This semester that city is Tokyo.
+I'm Amirassyl. I study Computational Sciences at Minerva University, which moves to a new country every year. This year that's Japan, and I live in Tokyo.
 
 I made this site for two reasons. The first is practical: I'm looking for a software engineering internship for summer 2027, and I wanted one place that shows what I've built and how I think about it. The [projects](/projects/) page has the write-ups.
 
