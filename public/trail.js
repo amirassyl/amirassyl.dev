@@ -32,7 +32,9 @@
     jp: { emoji: '🇯🇵', colors: ['#BC002D'] },
     sf: { emoji: '🌉', colors: ['#C0362C'] },
   };
-  const EMOJI_SIZE = 18; // px
+  const EMOJI_SIZE = 20; // px
+  const PLACE_COUNT = 3; // how many dots stay, as emoji, over a place name; the rest tuck away
+  const PLACE_SPREAD = 1.9; // how much further from the cursor they sit there (1 = no change)
   const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
   const MORPH_SPEED = 9; // how fast a dot turns into an emoji and back, per second
 
@@ -155,12 +157,19 @@
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   }
 
+  // The dots that stay over a place name: a few, picked evenly around the circle.
+  const kept = new Set(
+    Array.from({ length: Math.min(PLACE_COUNT, count) }, (_, k) => Math.round((k * count) / Math.min(PLACE_COUNT, count)) % count),
+  );
+
   // Where a dot wants to be right now: its spot around the pointer, plus a slow wander.
+  // Over a place name the whole group opens out, away from the word.
   function restingSpot(dot) {
     const angle = dot.angle + time * ORBIT_SPEED;
+    const distance = dot.distance * (1 + (PLACE_SPREAD - 1) * morph);
     return {
-      x: pointer.x + Math.cos(angle) * dot.distance + Math.sin(time * dot.driftX + dot.phase) * DRIFT,
-      y: pointer.y + Math.sin(angle) * dot.distance + Math.cos(time * dot.driftY + dot.phase) * DRIFT,
+      x: pointer.x + Math.cos(angle) * distance + Math.sin(time * dot.driftX + dot.phase) * DRIFT,
+      y: pointer.y + Math.sin(angle) * distance + Math.cos(time * dot.driftY + dot.phase) * DRIFT,
     };
   }
 
@@ -227,17 +236,19 @@
     ctx.globalAlpha = opacity;
     const asEmoji = morph > 0 && shownPlace && shownPlace.asEmoji;
     dots.forEach((dot, i) => {
-      // The plain dot shrinks away as the emoji grows in its place. Where emoji
-      // cannot be drawn, the dot keeps its shape and takes the place's colour.
-      const dotScale = asEmoji ? 1 - morph : 1;
+      // Over a place name only a few dots stay. Their plain shape shrinks away as
+      // the emoji grows in its place; the others simply shrink out of sight. Where
+      // emoji cannot be drawn, the few that stay keep their shape and take the place's colour.
+      const stays = kept.has(i);
+      const dotScale = asEmoji || !stays ? 1 - morph : 1;
       if (dotScale > 0.02) {
-        const recolour = morph > 0.5 && shownPlace && !shownPlace.asEmoji;
+        const recolour = stays && morph > 0.5 && shownPlace && !shownPlace.asEmoji;
         ctx.fillStyle = recolour ? shownPlace.colors[i % shownPlace.colors.length] : dot.color;
         ctx.beginPath();
         ctx.arc(dot.x, dot.y, dot.radius * dotScale, 0, Math.PI * 2);
         ctx.fill();
       }
-      if (asEmoji) {
+      if (asEmoji && stays) {
         ctx.font = `${(EMOJI_SIZE * morph).toFixed(1)}px ${EMOJI_FONT}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
