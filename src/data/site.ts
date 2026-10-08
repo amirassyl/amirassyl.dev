@@ -3,7 +3,7 @@
 export const site = {
   name: 'Amirassyl Sagyndyk',
   shortName: 'Amirassyl',
-  title: 'Amirassyl Sagyndyk',
+  title: 'Amirassyl',
   description:
     'Computational Sciences student at Minerva University. I build interactive web experiences and numerical models. Open to software internships for summer 2027.',
   url: 'https://amirassyl.dev',
@@ -15,12 +15,6 @@ export const site = {
   },
   status: 'Open to software engineering internships, summer 2027',
 };
-
-export const nav = [
-  { href: '/projects/', label: 'Projects' },
-  { href: '/blog/', label: 'Writing' },
-  { href: '/resume/', label: 'Résumé' },
-];
 
 export interface Role {
   org: string;

@@ -5,14 +5,14 @@ import PostList from '../components/PostList.astro';
 import { site, experience } from '../data/site';
 import { getProjects, getPosts } from '../lib/content';
 
-const projects = (await getProjects()).filter((p) => p.data.featured);
-const posts = (await getPosts()).slice(0, 3);
+const projects = await getProjects();
+const posts = (await getPosts()).slice(0, 5);
 ---
 
 <Base>
-  <section class="hero wrap">
-    <h1>{site.name}</h1>
-    <div class="lede">
+  <div class="wrap page">
+    <h1 class="name">{site.shortName}</h1>
+    <div class="intro">
       <p>
         I study Computational Sciences at Minerva University, which moves to a new country every year. This year
         that's Japan, and I live in Tokyo.
@@ -27,83 +27,68 @@ const posts = (await getPosts()).slice(0, 3);
         in the US works.
       </p>
     </div>
-    <div class="actions">
-      <a href="/projects/">See projects</a>
-      <a href="/resume/">Résumé</a>
-      <a href={`mailto:${site.email}`}>Email me</a>
-    </div>
-  </section>
 
-  <section class="section">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Selected projects</h2>
-        <a href="/projects/">All projects →</a>
-      </div>
+    <section class="section">
+      <h2 class="label">Projects</h2>
       <ProjectList projects={projects} />
-    </div>
-  </section>
+    </section>
 
-  <section class="section">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Experience</h2>
-        <a href="/resume/">Full résumé →</a>
-      </div>
-      <ol class="rows">
+    <section class="section">
+      <h2 class="label">Experience</h2>
+      <ul class="list">
         {
           experience.map((job) => (
             <li>
-              <span class="meta">{job.period}</span>
-              <div>
-                <h3>{job.org}</h3>
-                <p class="muted">{job.role}</p>
-              </div>
+              <h3 class="org">{job.org}</h3>
+              <span class="aside num">{job.period}</span>
+              <p>{job.role}</p>
             </li>
           ))
         }
-      </ol>
-    </div>
-  </section>
+      </ul>
+      <p class="more"><a href="/resume/">Full résumé</a></p>
+    </section>
 
-  {
-    posts.length > 0 && (
-      <section class="section">
-        <div class="wrap">
-          <div class="section-head">
-            <h2>Writing</h2>
-            <a href="/blog/">All posts →</a>
-          </div>
+    {
+      posts.length > 0 && (
+        <section class="section">
+          <h2 class="label">Writing</h2>
           <PostList posts={posts} />
-        </div>
-      </section>
-    )
-  }
+        </section>
+      )
+    }
 
-  <section class="section">
-    <div class="wrap contact">
-      <h2>Contact</h2>
-      <p class="muted">Outside of code I play classical guitar and piano. Say hi:</p>
-      <div class="actions">
-        <a href={`mailto:${site.email}`}>{site.email}</a>
-        <a href={site.links.linkedin} rel="noopener">LinkedIn</a>
-        <a href={site.links.github} rel="noopener">GitHub</a>
-      </div>
-    </div>
-  </section>
+    <section class="section">
+      <h2 class="label">Contact</h2>
+      <p>
+        Outside of code I play classical guitar and piano. Say hi:{' '}
+        <a href={`mailto:${site.email}`}>{site.email}</a>,{' '}
+        <a href={site.links.linkedin} rel="noopener">LinkedIn</a>,{' '}
+        <a href={site.links.github} rel="noopener">GitHub</a>.
+      </p>
+    </section>
+  </div>
 </Base>
 
 <style>
-  .hero {
-    padding-block: var(--space-page);
+  /* The name is the same size as the text around it, as a quiet title. */
+  .name {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-5);
   }
-  .hero h1 {
-    max-width: 20ch;
+  .intro p:last-child {
+    margin-bottom: 0;
   }
-  .lede {
-    margin-top: var(--space-5);
+  .org {
+    font-weight: var(--weight-medium);
+    letter-spacing: 0;
+    line-height: var(--leading);
+    margin: 0;
   }
-  .lede p:last-child {
+  .more {
+    margin: var(--space-5) 0 0;
+  }
+  section > p:last-child {
     margin-bottom: 0;
   }
 </style>

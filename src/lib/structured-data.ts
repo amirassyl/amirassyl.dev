@@ -8,7 +8,7 @@ export const defaultImage = {
   path: '/og-default.png',
   width: 1200,
   height: 630,
-  alt: `${site.name}. ${site.description.split(/\.\s/)[0]}. ${new URL(site.url).host}`,
+  alt: `${site.shortName}. ${site.description.split(/\.\s/)[0]}. ${new URL(site.url).host}`,
 };
 
 const personId = (origin: URL) => new URL('/#person', origin).href;

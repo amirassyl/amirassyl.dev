@@ -8,8 +8,7 @@ const posts = await getPosts();
 
 <Base title="Writing" description="Notes on what I'm building and learning.">
   <section class="wrap page">
-    <p class="meta">Writing</p>
-    <h1>Notes</h1>
+    <h1>Writing</h1>
     <p class="muted intro">What I'm building and learning. <a href="/rss.xml">Subscribe by RSS</a>.</p>
     {posts.length > 0 ? <PostList posts={posts} /> : <p class="muted">Nothing published yet.</p>}
   </section>
@@ -17,6 +16,6 @@ const posts = await getPosts();
 
 <style>
   .intro {
-    margin-bottom: var(--space-7);
+    margin-bottom: var(--space-6);
   }
 </style>

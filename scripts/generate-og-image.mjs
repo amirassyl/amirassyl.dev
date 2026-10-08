@@ -32,7 +32,7 @@ const sans = "'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif"
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
   <rect width="${WIDTH}" height="${HEIGHT}" fill="${BACKGROUND}" />
   <rect x="${MARGIN}" y="${MARGIN}" width="72" height="6" fill="${INK}" />
-  <text x="${MARGIN}" y="300" font-family="${sans}" font-size="88" font-weight="700" letter-spacing="-2" fill="${INK}">${escape(site.name)}</text>
+  <text x="${MARGIN}" y="300" font-family="${sans}" font-size="88" font-weight="700" letter-spacing="-2" fill="${INK}">${escape(site.shortName)}</text>
   <text x="${MARGIN}" y="372" font-family="${sans}" font-size="36" fill="${MUTED}">${escape(descriptor)}</text>
   <text x="${MARGIN}" y="${HEIGHT - MARGIN}" font-family="${sans}" font-size="32" font-weight="500" fill="${INK}">${escape(domain)}</text>
 </svg>`;

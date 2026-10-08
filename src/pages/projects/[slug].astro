@@ -15,19 +15,12 @@ const { Content } = await render(project);
 const structuredData = projectSchema(project, Astro.site!);
 ---
 
-<Base title={title} description={metaDescription ?? summary} type="article" structuredData={structuredData}>
+<Base title={title} description={metaDescription ?? summary} type="article" structuredData={structuredData} trail={[{ href: '/projects/', label: 'Projects' }]}>
   <article class="wrap page">
     <header>
-      <p class="meta"><a href="/projects/">Projects</a> / {context}</p>
       <h1>{title}</h1>
       <p class="lede">{summary}</p>
-      <dl>
-        <div><dt>When</dt><dd>{period}</dd></div>
-        <div>
-          <dt>Stack</dt>
-          <dd>{stack.join(', ')}</dd>
-        </div>
-      </dl>
+      <p class="meta details">{context} · {period} · {stack.join(', ')}</p>
       <div class="actions">
         {demo && <a href={demo} rel="noopener">Live prototype</a>}
         {repo && <a href={repo} rel="noopener">Source on GitHub</a>}
@@ -41,32 +34,10 @@ const structuredData = projectSchema(project, Astro.site!);
   header {
     margin-bottom: var(--space-7);
   }
-  h1 {
-    font-size: var(--text-2xl);
+  .lede {
+    margin-bottom: var(--space-3);
   }
-  dl {
-    margin: var(--space-5) 0 0;
-    padding-block: var(--space-4);
-    border-block: var(--border);
-    display: grid;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
-  }
-  dl div {
-    display: grid;
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    gap: var(--space-4);
-    align-items: baseline;
-  }
-  dt {
-    font-family: var(--font-meta);
-    font-size: var(--text-xs);
-    color: var(--muted);
-  }
-  dd {
+  .details {
     margin: 0;
-  }
-  .actions {
-    margin-top: var(--space-4);
   }
 </style>

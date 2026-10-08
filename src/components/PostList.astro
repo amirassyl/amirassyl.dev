@@ -9,29 +9,18 @@ interface Props {
 const { posts } = Astro.props;
 ---
 
-<ul class="rows">
+<ul class="list">
   {
     posts.map((post) => (
       <li>
-        <time class="meta" datetime={post.data.date.toISOString()}>
+        <a class="title-link" href={`/blog/${post.id}/`}>
+          {post.data.title}
+        </a>
+        <time class="aside num" datetime={post.data.date.toISOString()}>
           {formatDate(post.data.date)}
         </time>
-        <div>
-          <a class="title-link" href={`/blog/${post.id}/`}>
-            {post.data.title}
-          </a>
-          <p class="muted">{post.data.description}</p>
-        </div>
+        <p>{post.data.description}</p>
       </li>
     ))
   }
 </ul>
-
-<style>
-  a {
-    font-size: var(--text-lg);
-    font-weight: var(--weight-bold);
-    line-height: var(--leading-tight);
-    letter-spacing: var(--tracking-tight);
-  }
-</style>

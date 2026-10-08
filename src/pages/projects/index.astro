@@ -8,15 +8,14 @@ const projects = await getProjects();
 
 <Base title="Projects" description="Case studies: an Exploratorium exhibit prototype, a civic-data hackathon build, and two modeling projects.">
   <section class="wrap page">
-    <p class="meta">Projects</p>
-    <h1>Things I've built</h1>
+    <h1>Projects</h1>
     <p class="muted intro">Each one links to a write-up of what it does, how it works, and what I'd change.</p>
-    <ProjectList projects={projects} heading="h2" />
+    <ProjectList projects={projects} />
   </section>
 </Base>
 
 <style>
   .intro {
-    margin-bottom: var(--space-7);
+    margin-bottom: var(--space-6);
   }
 </style>

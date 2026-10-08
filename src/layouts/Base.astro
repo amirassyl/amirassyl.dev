@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { site, nav } from '../data/site';
+import { site } from '../data/site';
 import { defaultImage, personSchema, serializeJsonLd, type JsonLd } from '../lib/structured-data';
 
 interface Props {
@@ -13,10 +13,12 @@ interface Props {
   structuredData?: JsonLd | JsonLd[];
   /** Ask search engines not to index this page. */
   noindex?: boolean;
+  /** Links shown after the home link at the top of inner pages, e.g. the section a page belongs to. */
+  trail?: { href: string; label: string }[];
 }
 
-const { title, description = site.description, type = 'website', publishedTime, structuredData, noindex = false } = Astro.props;
-const pageTitle = title ? `${title} · ${site.name}` : site.title;
+const { title, description = site.description, type = 'website', publishedTime, structuredData, noindex = false, trail = [] } = Astro.props;
+const pageTitle = title ? `${title} · ${site.shortName}` : site.title;
 const origin = Astro.site ?? new URL(site.url);
 const canonical = new URL(Astro.url.pathname, origin);
 const path = Astro.url.pathname;
@@ -34,13 +36,13 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     <meta name="description" content={description} />
     {!noindex && <link rel="canonical" href={canonical} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title={`${site.name} — Writing`} href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.shortName} — Writing`} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta property="og:type" content={type} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:site_name" content={site.name} />
+    <meta property="og:site_name" content={site.shortName} />
     <meta property="og:image" content={image} />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content={String(defaultImage.width)} />
@@ -56,40 +58,25 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <header class="site-header">
-      <div class="wrap bar">
-        <a class="brand" href="/">{site.shortName}<span aria-hidden="true">.</span></a>
-        <nav aria-label="Primary">
-          <ul>
-            {
-              nav.map((item) => (
-                <li>
-                  <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
-                    {item.label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
-      </div>
-    </header>
+    {
+      path !== '/' && (
+        <header class="wrap crumb">
+          <nav aria-label="Breadcrumb">
+            <a href="/">{site.shortName}</a>
+            {trail.map((item) => (
+              <>
+                <span aria-hidden="true">/</span>
+                <a href={item.href}>{item.label}</a>
+              </>
+            ))}
+          </nav>
+        </header>
+      )
+    }
 
     <main id="main">
       <slot />
     </main>
-
-    <footer class="site-footer">
-      <div class="wrap bar">
-        <p class="muted">© {new Date().getFullYear()} {site.name}</p>
-        <ul>
-          <li><a href={`mailto:${site.email}`}>Email</a></li>
-          <li><a href={site.links.github} rel="me noopener">GitHub</a></li>
-          <li><a href={site.links.linkedin} rel="me noopener">LinkedIn</a></li>
-          <li><a href="/rss.xml">RSS</a></li>
-        </ul>
-      </div>
-    </footer>
   </body>
 </html>
 
@@ -98,8 +85,8 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     position: absolute;
     left: -999px;
     top: var(--space-2);
-    background: var(--accent);
-    color: var(--accent-ink);
+    background: var(--text);
+    color: var(--bg);
     padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-sm);
     z-index: 10;
@@ -107,79 +94,36 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   .skip:focus {
     left: var(--space-2);
   }
-  .bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--space-2) var(--space-4);
-    flex-wrap: wrap;
-  }
-  .site-header {
-    padding-block: var(--space-5);
-  }
-  .brand {
-    font-weight: var(--weight-bold);
-    letter-spacing: var(--tracking-tight);
-    color: var(--text);
-    text-decoration: none;
-  }
-  .brand span {
-    color: var(--accent);
-  }
-  ul {
-    display: flex;
-    gap: var(--space-1) var(--space-5);
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    flex-wrap: wrap;
-  }
-  nav a,
-  .site-footer a {
+  /* Inner pages get one quiet line back to the home page instead of a menu bar. */
+  .crumb {
+    padding-top: var(--space-page);
+    margin-bottom: calc(var(--space-6) - var(--space-page));
     font-size: var(--text-sm);
     color: var(--muted);
-    text-decoration: none;
   }
-  nav a:hover,
-  .site-footer a:hover {
+  .crumb nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--space-2);
+  }
+  .crumb a {
+    text-decoration-color: transparent;
+  }
+  .crumb a:hover {
     color: var(--text);
-    text-decoration: underline;
+    text-decoration-color: currentColor;
   }
-  nav a[aria-current='page'] {
-    color: var(--text);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-  }
-  .site-footer {
-    border-top: var(--border);
-    padding-block: var(--space-6);
-    font-size: var(--text-sm);
-  }
-  .site-footer p {
-    margin: 0;
-  }
-  /* Phones and touch screens: header and footer links are about 44px tall. Desktop is unchanged. */
+  /* Phones and touch screens: the links are about 44px tall. */
   @media (max-width: 40rem), (pointer: coarse) {
-    .brand,
-    nav a,
-    .site-footer a {
+    .crumb a {
       display: inline-flex;
       align-items: center;
       min-height: 2.75rem;
     }
-    .bar {
-      align-items: center;
-    }
-    .site-header {
-      padding-block: var(--space-1);
-    }
-    .site-footer {
-      padding-block: var(--space-3);
-    }
   }
   @media print {
-    .site-header,
-    .site-footer,
+    .crumb,
     .skip {
       display: none;
     }
