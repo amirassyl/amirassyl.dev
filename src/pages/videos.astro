@@ -4,6 +4,11 @@ import { fileVersion } from '../lib/assets';
 import { getVideos } from '../lib/videos';
 
 const videos = getVideos();
+// Wide videos first, then tall ones in their own row so every row has tiles of one shape.
+const groups = [
+  { vertical: false, items: videos.filter((video) => !video.vertical) },
+  { vertical: true, items: videos.filter((video) => video.vertical) },
+].filter((group) => group.items.length > 0);
 const scriptVersion = fileVersion('public/videos.js');
 ---
 
@@ -18,24 +23,36 @@ const scriptVersion = fileVersion('public/videos.js');
       videos.length === 0 ? (
         <p class="muted">Nothing here yet.</p>
       ) : (
-        <ul class="grid">
-          {videos.map((video) => (
-            <li>
-              <a class="frame" href={video.watchUrl} data-video={video.full ? undefined : video.id} data-file={video.full} data-title={video.title} rel="noopener">
-                <img src={video.poster} alt="" width="640" height="360" loading="lazy" decoding="async" />
-                {video.clip && (
-                  <video src={video.clip} muted loop playsinline preload="none" tabindex="-1" aria-hidden="true" />
-                )}
-                <span class="sr-only">Play {video.title}</span>
-              </a>
-              <div class="caption">
-                <span class="title">{video.title}</span>
-                <span class="year num">{video.year}</span>
-              </div>
-              {video.note && <p class="note">{video.note}</p>}
-            </li>
+        <>
+          {groups.map((group) => (
+            <ul class:list={['grid', { tall: group.vertical }]}>
+              {group.items.map((video) => (
+                <li>
+                  <a
+                    class="frame"
+                    href={video.watchUrl}
+                    data-video={video.full ? undefined : video.id}
+                    data-file={video.full}
+                    data-title={video.title}
+                    data-vertical={video.vertical ? '' : undefined}
+                    rel="noopener"
+                  >
+                    <img src={video.poster} alt="" loading="lazy" decoding="async" />
+                    {video.clip && (
+                      <video src={video.clip} muted loop playsinline preload="none" tabindex="-1" aria-hidden="true" />
+                    )}
+                    <span class="sr-only">Play {video.title}</span>
+                  </a>
+                  <div class="caption">
+                    <span class="title">{video.title}</span>
+                    <span class="year num">{video.year}</span>
+                  </div>
+                  {video.note && <p class="note">{video.note}</p>}
+                </li>
+              ))}
+            </ul>
           ))}
-        </ul>
+        </>
       )
     }
   </section>
@@ -63,6 +80,16 @@ const scriptVersion = fileVersion('public/videos.js');
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
     gap: var(--space-6) var(--space-5);
+  }
+  .grid + .grid {
+    margin-top: var(--space-7);
+  }
+  /* Tall videos get narrower tiles in a row of their own. */
+  .grid.tall {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  }
+  .tall .frame {
+    aspect-ratio: 9 / 16;
   }
   .frame {
     position: relative;
@@ -125,6 +152,13 @@ const scriptVersion = fileVersion('public/videos.js');
   }
   .player::backdrop {
     background: rgb(0 0 0 / 0.82);
+  }
+  /* A tall video gets a tall player that fits the window height. */
+  .player:global(.tall) {
+    width: min(100% - 2 * var(--gutter), calc((100vh - 6rem) * 9 / 16));
+  }
+  .player:global(.tall) .stage {
+    aspect-ratio: 9 / 16;
   }
   .stage {
     aspect-ratio: 16 / 9;

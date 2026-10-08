@@ -3,6 +3,7 @@
 //   title    what to call it on the page
 //   year     shown next to the title
 //   note     optional one-line description shown under the title
+//   vertical true for a tall (9:16) video; these are shown in their own row
 //   and ONE of:
 //   youtube  the YouTube link (any form: watch, youtu.be, shorts) or just the video ID
 //   file     the name of a video hosted on this site (see below)
@@ -22,11 +23,17 @@ export interface Video {
   title: string;
   year: number;
   note?: string;
+  vertical?: boolean;
   youtube?: string;
   file?: string;
 }
 
 export const videos: Video[] = [
+  { title: 'San Francisco', year: 2026, youtube: 'https://youtu.be/cc36LDgcT_Q' },
+  { title: 'Continuum Minerva', year: 2026, youtube: 'https://youtu.be/RtNOG1S8TjQ' },
+  { title: 'Miami', year: 2026, file: 'miami' },
   { title: 'Paper cutout effect', year: 2026, file: 'paper-cutout-effect' },
   { title: 'Circle effect', year: 2026, file: 'circle-effect' },
+  { title: "Sofa and Ilyas seniors' performance", year: 2026, youtube: 'https://youtu.be/RP6_FDL6uHo', vertical: true },
+  { title: 'Рай на Земле', year: 2024, youtube: 'https://youtu.be/ADTRe63PD3U', vertical: true },
 ];

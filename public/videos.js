@@ -47,6 +47,7 @@
           player.allowFullscreen = true;
         }
         player.title = frame.dataset.title || 'Video';
+        dialog.classList.toggle('tall', 'vertical' in frame.dataset);
         stage.replaceChildren(player);
         dialog.showModal();
       });
