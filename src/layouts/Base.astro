@@ -51,7 +51,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     <meta name="twitter:image" content={image} />
     <meta name="twitter:image:alt" content={defaultImage.alt} />
     {noindex && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#fcfcfa" />
+    <meta name="theme-color" content="#f8f3e6" />
     {jsonLd.map((data) => <script is:inline type="application/ld+json" set:html={serializeJsonLd(data)} />)}
   </head>
   <body>
@@ -124,7 +124,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     text-decoration: none;
   }
   .brand span {
-    color: var(--accent);
+    color: inherit;
   }
   ul {
     display: flex;
@@ -144,9 +144,11 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   .site-footer a:hover {
     color: var(--text);
     text-decoration: underline;
+    text-decoration-thickness: 2px;
   }
   nav a[aria-current='page'] {
     color: var(--text);
+    font-weight: var(--weight-bold);
     text-decoration: underline;
     text-decoration-thickness: 1px;
   }

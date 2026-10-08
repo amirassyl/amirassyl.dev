@@ -92,7 +92,17 @@ const posts = (await getPosts()).slice(0, 3);
     padding-block: var(--space-page);
   }
   .hero h1 {
-    max-width: 20ch;
+    max-width: 18ch;
+    font-weight: var(--weight-medium);
+    line-height: 1.12;
+    margin-block: var(--space-4) var(--space-5);
+  }
+  .hero .lede::first-line {
+    font-variant-caps: small-caps;
+    letter-spacing: 0.04em;
+  }
+  .hero .actions {
+    font-style: italic;
   }
   .hero em {
     font-style: italic;
