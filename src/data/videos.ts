@@ -29,11 +29,11 @@ export interface Video {
 }
 
 export const videos: Video[] = [
-  { title: 'San Francisco', year: 2026, youtube: 'https://youtu.be/cc36LDgcT_Q' },
-  { title: 'Continuum Minerva', year: 2026, youtube: 'https://youtu.be/RtNOG1S8TjQ' },
   { title: 'Miami', year: 2026, file: 'miami' },
-  { title: 'Paper cutout effect', year: 2026, file: 'paper-cutout-effect' },
-  { title: 'Circle effect', year: 2026, file: 'circle-effect' },
-  { title: "Sofa and Ilyas seniors' performance", year: 2026, youtube: 'https://youtu.be/RP6_FDL6uHo', vertical: true },
-  { title: 'Рай на Земле', year: 2024, youtube: 'https://youtu.be/ADTRe63PD3U', vertical: true },
+  { title: 'Paper cutouts', year: 2026, file: 'paper-cutout-effect', note: 'Family photos, cut out and set in motion.' },
+  { title: 'Circles', year: 2026, file: 'circle-effect', note: "Friends' selfies, multiplying in circles." },
+  { title: 'Almaty to San Francisco', year: 2025, youtube: 'https://youtu.be/cc36LDgcT_Q', note: 'A travel film, shot ultrawide.' },
+  { title: 'Continuum', year: 2026, youtube: 'https://youtu.be/RtNOG1S8TjQ', note: 'Minerva classmates look back on a year in San Francisco.' },
+  { title: "Seniors' song", year: 2025, file: 'sofa-and-ilyas', vertical: true, note: 'Sofa and Ilyas, NIS PhM Astana class of 2025.' },
+  { title: 'Paradise on Earth', year: 2024, file: 'rai-na-zemle', vertical: true, note: 'A trip to Malaysia. In Russian.' },
 ];

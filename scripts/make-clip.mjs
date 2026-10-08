@@ -24,10 +24,17 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync } fro
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const PREVIEW_HEIGHT = 480; // tiles are small, so this is plenty
+const PREVIEW_HEIGHT = 480; // shorter side of the preview; tiles are small, so this is plenty
 const PREVIEW_QUALITY = 28; // x264 CRF: higher is smaller and blurrier
-const FULL_HEIGHT = 1080; // the full video is never made larger than this
-const FULL_QUALITY = 24;
+// The full video: tried in this order until the file fits under the size limit.
+// Longer videos end up smaller and a little softer.
+const FULL_ATTEMPTS = [
+  { height: 1080, quality: 24 },
+  { height: 720, quality: 26 },
+  { height: 720, quality: 30 },
+  { height: 720, quality: 32 },
+  { height: 540, quality: 31 },
+];
 const DEFAULT_LENGTH = 8;
 const HOSTED_PREVIEW_LIMIT = 20; // seconds
 const MAX_FILE_MB = 24; // Cloudflare refuses single files over 25 MB
@@ -112,6 +119,8 @@ const work = mkdtempSync(join(tmpdir(), 'clip-'));
 let source = localFile;
 let sourceStart = start;
 
+// Scale so the SHORTER side is at most `limit` pixels, which treats wide and tall videos alike.
+const fit = (limit) => `scale='if(gt(iw,ih),-2,min(${limit},iw))':'if(gt(iw,ih),min(${limit},ih),-2)'`;
 const run = (options) => execFileSync(ffmpeg, ['-y', '-loglevel', 'error', ...options], { stdio: 'inherit' });
 const megabytes = (path) => statSync(path).size / 1024 / 1024;
 const size = (path) => (megabytes(path) < 1 ? `${Math.round(megabytes(path) * 1024)} KB` : `${megabytes(path).toFixed(1)} MB`);
@@ -153,7 +162,7 @@ try {
   run([
     '-ss', String(sourceStart), '-t', String(length), '-i', source,
     '-map', '0:v:0', // the main picture only: no sound, no embedded cover image
-    '-vf', `scale=-2:'min(${PREVIEW_HEIGHT},ih)',fps=30`,
+    '-vf', `${fit(PREVIEW_HEIGHT)},fps=30`,
     '-c:v', 'libx264', '-crf', String(PREVIEW_QUALITY), '-preset', 'slow',
     '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
     clip,
@@ -165,20 +174,25 @@ try {
   saved.push(still);
 
   if (hosted) {
-    console.log('Encoding the full video…');
-    run([
-      '-i', source,
-      '-map', '0:v:0', '-map', '0:a:0?',
-      '-vf', `scale=-2:'min(${FULL_HEIGHT},ih)'`,
-      '-c:v', 'libx264', '-crf', String(FULL_QUALITY), '-preset', 'slow', '-pix_fmt', 'yuv420p',
-      '-c:a', 'aac', '-b:a', '128k',
-      '-movflags', '+faststart',
-      full,
-    ]);
-    saved.push(full);
-    if (megabytes(full) > MAX_FILE_MB) {
-      fail(`${full} is ${size(full)}, over the ${MAX_FILE_MB} MB the site can serve. Use a shorter video, or put it on YouTube instead.`);
+    for (const attempt of FULL_ATTEMPTS) {
+      console.log(`Encoding the full video at up to ${attempt.height}p…`);
+      run([
+        '-i', source,
+        '-map', '0:v:0', '-map', '0:a:0?',
+        '-vf', fit(attempt.height),
+        '-c:v', 'libx264', '-crf', String(attempt.quality), '-preset', 'slow', '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac', '-b:a', '128k',
+        '-movflags', '+faststart',
+        full,
+      ]);
+      if (megabytes(full) <= MAX_FILE_MB) break;
+      console.log(`  ${size(full)} is over the ${MAX_FILE_MB} MB limit, trying smaller…`);
     }
+    if (megabytes(full) > MAX_FILE_MB) {
+      rmSync(full, { force: true });
+      fail(`The full video is still over the ${MAX_FILE_MB} MB the site can serve. Use a shorter video, or keep it on YouTube.`);
+    }
+    saved.push(full);
   }
 
   console.log('\nSaved:');

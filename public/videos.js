@@ -42,7 +42,7 @@
           player.playsInline = true;
         } else {
           player = document.createElement('iframe');
-          player.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(frame.dataset.video)}?autoplay=1&rel=0`;
+          player.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(frame.dataset.video)}?autoplay=1&rel=0&iv_load_policy=3&playsinline=1`;
           player.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
           player.allowFullscreen = true;
         }
