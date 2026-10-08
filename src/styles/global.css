@@ -13,6 +13,11 @@
   --accent: #1d4ed8;
   --accent-ink: #ffffff;
 
+  /* Dotted page background */
+  --dot: #d6d6cf;
+  --dot-size: 1px;
+  --dot-gap: 22px;
+
   /* Fonts: system stacks only */
   --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
@@ -75,6 +80,7 @@
     --muted: #333;
     --accent: #000;
     --accent-ink: #fff;
+    --dot: transparent;
     color-scheme: light;
   }
 }
@@ -91,7 +97,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--dot) var(--dot-size), transparent var(--dot-size));
+  background-size: var(--dot-gap) var(--dot-gap);
   color: var(--text);
   font-family: var(--font-body);
   font-size: var(--text-base);
