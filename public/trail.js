@@ -7,14 +7,14 @@
 // cursor (see springyEmojiCursor in github.com/tholman/cursor-effects), with a
 // separate resting spot per dot instead of a chain.
 (() => {
-  const COLORS = ['#F2AF29', '#3B82F6', '#FF4D4D', '#FFB703', '#4ADE80']; // marigold, cobalt, terracotta, sage
-  const COUNT = [5,10]; // keep between 3 and 7
+  const COLORS = ['#F2AF29', '#3B82F6', '#FF4D4D', '#FFB703', '#4ADE80']; // marigold, blue, red, amber, green
+  const COUNT = [5, 10]; // how many dots: a random whole number in this range, picked on each page load
   const MIN_RADIUS = 3.5;
   const MAX_RADIUS = 6;
-  const MIN_DISTANCE = 22; // px from the pointer, so no dot sits under it
-  const MAX_DISTANCE = 30;
-  const STIFFNESS = [100, 160]; // spring pull; higher follows the cursor more tightly
-  const DAMPING = [4.5, 7]; // resistance; lower is bouncier
+  const MIN_DISTANCE = 14; // px from the pointer, so no dot sits under it
+  const MAX_DISTANCE = 22;
+  const STIFFNESS = [170, 250]; // spring pull; higher follows the cursor more tightly
+  const DAMPING = [5.5, 8]; // resistance; lower is bouncier
   const DRIFT = 3; // px each dot wanders around its spot while the cursor is still
   const DRIFT_SPEED = [0.5, 1.1]; // wander cycles, in radians per second
   const ORBIT_SPEED = 0.12; // slow rotation of the whole group, radians per second
@@ -45,7 +45,8 @@
   let last = 0;
   let time = 0;
 
-  const dots = Array.from({ length: COUNT }, (_, i) => ({
+  const count = Math.round(random(COUNT[0], COUNT[1]));
+  const dots = Array.from({ length: count }, (_, i) => ({
     x: 0,
     y: 0,
     vx: 0,
@@ -53,7 +54,7 @@
     radius: random(MIN_RADIUS, MAX_RADIUS),
     color: COLORS[i % COLORS.length],
     // Spread the dots around the pointer, with some irregularity.
-    angle: (i / COUNT) * Math.PI * 2 + random(-0.35, 0.35),
+    angle: (i / count) * Math.PI * 2 + random(-0.35, 0.35),
     distance: random(MIN_DISTANCE, MAX_DISTANCE),
     stiffness: random(STIFFNESS[0], STIFFNESS[1]),
     damping: random(DAMPING[0], DAMPING[1]),
