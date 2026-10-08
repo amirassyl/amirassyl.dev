@@ -12,7 +12,7 @@
   const MIN_RADIUS = 3.5;
   const MAX_RADIUS = 6;
   const MIN_DISTANCE = 14; // px from the pointer, so no dot sits under it
-  const MAX_DISTANCE = 22;
+  const MAX_DISTANCE = 30;
   const STIFFNESS = [170, 250]; // spring pull; higher follows the cursor more tightly
   const DAMPING = [10, 15]; // resistance; lower is bouncier; higher values reduce post-movement wobble
   const DRIFT = 2; // px each dot wanders around its spot while the cursor is still
