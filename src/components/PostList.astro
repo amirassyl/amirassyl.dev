@@ -13,7 +13,7 @@ const { posts } = Astro.props;
   {
     posts.map((post) => (
       <li>
-        <time class="meta" datetime={post.data.date.toISOString()}>
+        <time class="meta date" datetime={post.data.date.toISOString()}>
           {formatDate(post.data.date)}
         </time>
         <div>
@@ -29,9 +29,6 @@ const { posts } = Astro.props;
 
 <style>
   a {
-    font-size: var(--text-lg);
-    font-weight: var(--weight-bold);
-    line-height: var(--leading-tight);
-    letter-spacing: var(--tracking-tight);
+    font-size: var(--text-base);
   }
 </style>

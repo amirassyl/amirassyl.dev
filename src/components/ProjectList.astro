@@ -14,14 +14,17 @@ const { projects, heading: Heading = 'h3' } = Astro.props;
   {
     projects.map((project) => (
       <li>
-        <p class="meta">{project.data.context}</p>
         <Heading class="title">
           <a class="title-link" href={`/projects/${project.id}/`}>
             {project.data.title}
           </a>
         </Heading>
         <p class="summary muted">{project.data.summary}</p>
-        <p class="meta stack">{project.data.stack.slice(0, 5).join(' · ')}</p>
+        <p class="meta stack">
+          {project.data.context}
+          {' · '}
+          {project.data.stack.slice(0, 5).join(' · ')}
+        </p>
       </li>
     ))
   }
@@ -34,26 +37,18 @@ const { projects, heading: Heading = 'h3' } = Astro.props;
     margin: 0;
   }
   li {
-    padding-block: var(--space-5);
-    border-top: var(--border);
-  }
-  li:first-child {
-    border-top: 0;
-    padding-top: 0;
-  }
-  li:last-child {
-    padding-bottom: 0;
-  }
-  .meta {
-    margin-bottom: var(--space-2);
+    padding-block: var(--space-3);
   }
   .title {
-    font-size: var(--text-lg);
-    margin-bottom: var(--space-2);
+    display: inline;
+    font-size: var(--text-base);
+    letter-spacing: 0;
+    margin: 0;
   }
   .summary {
+    display: inline;
     font-size: var(--text-sm);
-    margin-bottom: var(--space-3);
+    margin: 0 0 0 var(--space-3);
   }
   .stack {
     margin: 0;

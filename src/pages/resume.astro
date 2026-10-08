@@ -28,7 +28,7 @@ const projects = await getProjects();
           <div class="entry">
             <div class="row">
               <h3>{job.org}</h3>
-              <span class="meta">{job.period}</span>
+              <span class="meta date">{job.period}</span>
             </div>
             <p class="role">{job.role}</p>
             <ul>{job.points.map((point) => <li>{point}</li>)}</ul>
@@ -44,7 +44,7 @@ const projects = await getProjects();
           <div class="entry">
             <div class="row">
               <h3>{school.org}</h3>
-              <span class="meta">{school.period}</span>
+              <span class="meta date">{school.period}</span>
             </div>
             <p class="role">{school.detail}</p>
             <ul>{school.points.map((point) => <li>{point}</li>)}</ul>
@@ -60,7 +60,7 @@ const projects = await getProjects();
           <div class="entry">
             <div class="row">
               <h3><a class="title-link" href={`/projects/${project.id}/`}>{project.data.title}</a></h3>
-              <span class="meta">{project.data.period}</span>
+              <span class="meta date">{project.data.period}</span>
             </div>
             <p class="role">{project.data.stack.slice(0, 5).join(', ')}</p>
             <p>{project.data.summary}</p>
@@ -97,21 +97,20 @@ const projects = await getProjects();
     margin-top: var(--space-4);
   }
   section {
-    margin-top: var(--space-7);
+    margin-top: var(--space-6);
   }
   h2 {
-    font-family: var(--font-meta);
     font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
+    font-weight: var(--weight-bold);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--muted);
     padding-bottom: var(--space-2);
     border-bottom: var(--border);
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-4);
   }
   .entry {
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-4);
   }
   .entry:last-child {
     margin-bottom: 0;

@@ -45,7 +45,7 @@ const posts = (await getPosts()).slice(0, 3);
         {
           experience.map((job) => (
             <li>
-              <span class="meta">{job.period}</span>
+              <span class="meta date">{job.period}</span>
               <div>
                 <h3>{job.org}</h3>
                 <p class="muted">{job.role}</p>
@@ -89,15 +89,15 @@ const posts = (await getPosts()).slice(0, 3);
 
 <style>
   .hero {
-    padding-block: var(--space-page);
+    padding-top: var(--space-page);
   }
   .hero h1 {
-    max-width: 20ch;
+    text-wrap: pretty;
   }
   .hero em {
     font-style: italic;
   }
   .lede {
-    margin-top: var(--space-5);
+    margin-bottom: 0;
   }
 </style>

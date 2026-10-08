@@ -51,7 +51,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     <meta name="twitter:image" content={image} />
     <meta name="twitter:image:alt" content={defaultImage.alt} />
     {noindex && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#fcfcfa" />
+    <meta name="theme-color" content="#ffffff" />
     {jsonLd.map((data) => <script is:inline type="application/ld+json" set:html={serializeJsonLd(data)} />)}
   </head>
   <body>
@@ -115,7 +115,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     flex-wrap: wrap;
   }
   .site-header {
-    padding-block: var(--space-5);
+    padding-block: var(--space-4);
   }
   .brand {
     font-weight: var(--weight-bold);
@@ -123,7 +123,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     color: var(--text);
     text-decoration: none;
   }
-  .brand span {
+  .brand:hover {
     color: var(--accent);
   }
   ul {
@@ -142,7 +142,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   }
   nav a:hover,
   .site-footer a:hover {
-    color: var(--text);
+    color: var(--accent);
     text-decoration: underline;
   }
   nav a[aria-current='page'] {
@@ -151,8 +151,9 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     text-decoration-thickness: 1px;
   }
   .site-footer {
+    margin-top: var(--space-7);
     border-top: var(--border);
-    padding-block: var(--space-6);
+    padding-block: var(--space-5);
     font-size: var(--text-sm);
   }
   .site-footer p {

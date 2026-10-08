@@ -20,7 +20,7 @@ const structuredData = blogPostingSchema(post, Astro.site!);
     <header>
       <p class="meta"><a href="/blog/">Writing</a></p>
       <h1>{title}</h1>
-      <p class="meta date">
+      <p class="meta date date-line">
         <time datetime={date.toISOString()}>{formatDate(date)}</time>
         {tags.length > 0 && <span> · {tags.join(', ')}</span>}
       </p>
@@ -31,12 +31,12 @@ const structuredData = blogPostingSchema(post, Astro.site!);
 
 <style>
   header {
-    margin-bottom: var(--space-7);
+    margin-bottom: var(--space-6);
   }
   h1 {
     font-size: var(--text-2xl);
   }
-  .date {
+  .date-line {
     margin: 0;
   }
 </style>
