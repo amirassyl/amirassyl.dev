@@ -1,5 +1,10 @@
 import { existsSync } from 'node:fs';
 import { videos, type Video } from '../data/videos';
+import { fileVersion } from './assets';
+
+// The address of a file in public/clips/, tagged with a hash of its contents so a
+// replaced clip or still shows up straight away instead of after the browser's cache expires.
+const clipUrl = (name: string) => `/clips/${name}?v=${fileVersion(`public/clips/${name}`)}`;
 
 /** Pulls the 11-character video ID out of any YouTube link, or accepts a bare ID. */
 export function youtubeId(input: string): string {
@@ -35,8 +40,8 @@ export function getVideos(): VideoTile[] {
           throw new Error(`${where}: public/clips/${name} is missing. Run: npm run clip -- --name ${id} --file <video file>`);
         }
       }
-      const full = `/clips/${id}-full.mp4`;
-      return { ...video, id, watchUrl: full, full, poster: `/clips/${id}.jpg`, clip: `/clips/${id}.mp4` };
+      const full = clipUrl(`${id}-full.mp4`);
+      return { ...video, id, watchUrl: full, full, poster: clipUrl(`${id}.jpg`), clip: clipUrl(`${id}.mp4`) };
     }
 
     if (!video.youtube) throw new Error(`${where} needs either youtube or file`);
@@ -45,8 +50,8 @@ export function getVideos(): VideoTile[] {
       ...video,
       id,
       watchUrl: `https://www.youtube.com/watch?v=${id}`,
-      poster: existsSync(`public/clips/${id}.jpg`) ? `/clips/${id}.jpg` : `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
-      clip: existsSync(`public/clips/${id}.mp4`) ? `/clips/${id}.mp4` : undefined,
+      poster: existsSync(`public/clips/${id}.jpg`) ? clipUrl(`${id}.jpg`) : `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+      clip: existsSync(`public/clips/${id}.mp4`) ? clipUrl(`${id}.mp4`) : undefined,
     };
   });
 }
