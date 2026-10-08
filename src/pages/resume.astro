@@ -2,8 +2,10 @@
 import Base from '../layouts/Base.astro';
 import { site, experience, education, skills } from '../data/site';
 import { getProjects } from '../lib/content';
+import { fileVersion } from '../lib/assets';
 
 const projects = await getProjects();
+const pdfVersion = fileVersion('public/Amirassyl-Sagyndyk-CV.pdf');
 ---
 
 <Base title="Résumé" description="Résumé of Amirassyl Sagyndyk: experience, education, projects, and skills.">
@@ -18,7 +20,7 @@ const projects = await getProjects();
         <a href={site.links.github} rel="noopener">github.com/amirassyl</a>
       </p>
       <p class="muted">Eligible for CPT.</p>
-      <button class="btn print" type="button" onclick="window.print()">Print / save as PDF</button>
+      <a class="btn download" href={`/Amirassyl-Sagyndyk-CV.pdf?v=${pdfVersion}`} download="Amirassyl-Sagyndyk-CV.pdf">Download PDF</a>
     </header>
 
     <section>
@@ -90,7 +92,7 @@ const projects = await getProjects();
     margin: 0 0 var(--space-1);
     font-size: var(--text-sm);
   }
-  .print {
+  .download {
     margin-top: var(--space-4);
   }
   section {
@@ -167,7 +169,7 @@ const projects = await getProjects();
     :global(body) {
       font-size: 10.5pt;
     }
-    .print {
+    .download {
       display: none;
     }
     .resume {
