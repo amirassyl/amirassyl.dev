@@ -12,13 +12,13 @@
   const MIN_RADIUS = 3.5;
   const MAX_RADIUS = 6;
   const MIN_DISTANCE = 22; // px from the pointer, so no dot sits under it
-  const MAX_DISTANCE = 40;
-  const STIFFNESS = [70, 130]; // spring pull; higher follows the cursor more tightly
+  const MAX_DISTANCE = 30;
+  const STIFFNESS = [100, 160]; // spring pull; higher follows the cursor more tightly
   const DAMPING = [4.5, 7]; // resistance; lower is bouncier
-  const DRIFT = 6; // px each dot wanders around its spot while the cursor is still
+  const DRIFT = 3; // px each dot wanders around its spot while the cursor is still
   const DRIFT_SPEED = [0.5, 1.1]; // wander cycles, in radians per second
   const ORBIT_SPEED = 0.12; // slow rotation of the whole group, radians per second
-  const FADE_SPEED = 4; // how fast the dots appear and disappear, per second
+  const FADE_SPEED = 10; // how fast the dots appear and disappear, per second
 
   // Nothing for people who ask for less motion, or on devices without a mouse.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
