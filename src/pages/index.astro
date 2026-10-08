@@ -6,6 +6,7 @@ import Ripple from '../components/Ripple.astro';
 import { site, experience } from '../data/site';
 import { getProjects, getPosts } from '../lib/content';
 import { videos } from '../data/videos';
+import { fileVersion } from '../lib/assets';
 
 const projects = await getProjects();
 const posts = (await getPosts()).slice(0, 5);
@@ -83,6 +84,7 @@ const hasVideos = videos.length > 0;
       </p>
     </section>
   </div>
+  <script slot="scripts" is:inline defer src={`/hint.js?v=${fileVersion('public/hint.js')}`}></script>
 </Base>
 
 <style>

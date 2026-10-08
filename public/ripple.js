@@ -14,8 +14,21 @@
     if (!letters.length) continue;
     const stagger = Number(name.dataset.rippleStagger) || STAGGER;
 
+    // Send one swell outward from the letter at `origin`.
+    const play = (origin) => {
+      // Letters further from that one start later, so the swell spreads both ways.
+      letters.forEach((letter, i) => {
+        letter.style.animationDelay = `${Math.abs(i - origin) * stagger}ms`;
+      });
+
+      // Restart the animation even if a previous ripple is still running.
+      name.classList.remove('rippling');
+      void name.offsetWidth;
+      name.classList.add('rippling');
+    };
+
     name.addEventListener('pointerenter', (event) => {
-      // Find the letter closest to where the pointer came in.
+      // Start from the letter closest to where the pointer came in.
       let origin = 0;
       let nearest = Infinity;
       letters.forEach((letter, i) => {
@@ -26,16 +39,10 @@
           origin = i;
         }
       });
-
-      // Letters further from that one start later, so the swell spreads both ways.
-      letters.forEach((letter, i) => {
-        letter.style.animationDelay = `${Math.abs(i - origin) * stagger}ms`;
-      });
-
-      // Restart the animation even if a previous ripple is still running.
-      name.classList.remove('rippling');
-      void name.offsetWidth;
-      name.classList.add('rippling');
+      play(origin);
     });
+
+    // Other scripts can ask for a ripple without a pointer (the first-visit hint does).
+    name.addEventListener('ripple:play', () => play(0));
   }
 })();

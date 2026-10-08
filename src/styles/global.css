@@ -333,6 +333,51 @@ a[data-ripple]:hover {
   }
 }
 
+/* First-visit hint (hint.js): a small pill at the bottom of the window, like a game's control tip. */
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-6);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3);
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 0.75rem);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.1);
+}
+.hint.shown {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.hint svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hint {
+    transform: translate(-50%, 0);
+    transition: opacity 0.2s ease;
+  }
+}
+@media print {
+  .hint {
+    display: none;
+  }
+}
+
 /* Lists of things: a title, a grey line under it, optional grey detail on the right. */
 .list {
   list-style: none;
