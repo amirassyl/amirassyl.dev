@@ -1,8 +1,7 @@
 ---
-import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 import '../styles/global.css';
 import { site } from '../data/site';
+import { fileVersion } from '../lib/assets';
 import { defaultImage, personSchema, serializeJsonLd, type JsonLd } from '../lib/structured-data';
 
 interface Props {
@@ -17,9 +16,11 @@ interface Props {
   noindex?: boolean;
   /** Links shown after the home link at the top of inner pages, e.g. the section a page belongs to. */
   trail?: { href: string; label: string }[];
+  /** Use the wider column, for pages such as the video grid. */
+  wide?: boolean;
 }
 
-const { title, description = site.description, type = 'website', publishedTime, structuredData, noindex = false, trail = [] } = Astro.props;
+const { title, description = site.description, type = 'website', publishedTime, structuredData, noindex = false, trail = [], wide = false } = Astro.props;
 const pageTitle = title ? `${title} · ${site.shortName}` : site.title;
 const origin = Astro.site ?? new URL(site.url);
 const canonical = new URL(Astro.url.pathname, origin);
@@ -28,7 +29,6 @@ const path = Astro.url.pathname;
 const image = new URL(defaultImage.path, origin);
 
 // The script URL carries a hash of the file, so browsers fetch a new copy whenever it changes.
-const fileVersion = (path: string) => createHash('sha256').update(readFileSync(path)).digest('hex').slice(0, 8);
 const trailVersion = fileVersion('public/trail.js');
 const rippleVersion = fileVersion('public/ripple.js');
 const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [personSchema(origin)] : [];
@@ -67,7 +67,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     <a class="skip" href="#main">Skip to content</a>
     {
       path !== '/' && (
-        <header class="wrap crumb">
+        <header class:list={[wide ? 'wide' : 'wrap', 'crumb']}>
           <nav aria-label="Breadcrumb">
             <a href="/">{site.shortName}</a>
             {trail.map((item) => (
@@ -86,6 +86,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     </main>
     <script is:inline defer src={`/trail.js?v=${trailVersion}`}></script>
     <script is:inline defer src={`/ripple.js?v=${rippleVersion}`}></script>
+    <slot name="scripts" />
   </body>
 </html>
 

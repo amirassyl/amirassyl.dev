@@ -4,9 +4,12 @@ import ProjectList from '../components/ProjectList.astro';
 import PostList from '../components/PostList.astro';
 import { site, experience } from '../data/site';
 import { getProjects, getPosts } from '../lib/content';
+import { videos } from '../data/videos';
 
 const projects = await getProjects();
 const posts = (await getPosts()).slice(0, 5);
+// The link to the videos page appears once there is at least one video to show.
+const hasVideos = videos.length > 0;
 ---
 
 <Base>
@@ -65,7 +68,7 @@ const posts = (await getPosts()).slice(0, 5);
     <section class="section">
       <h2 class="label">Contact</h2>
       <p>
-        Outside of code I play classical guitar and piano. <br />
+        Outside of code I play classical guitar and piano{hasVideos && <>, and <a href="/videos/">edit videos</a></>}. <br />
         Say hi:{' '}
         <a href={`mailto:${site.email}`}>Email</a>,{' '}
         <a href={site.links.linkedin} rel="noopener">LinkedIn</a>,{' '}

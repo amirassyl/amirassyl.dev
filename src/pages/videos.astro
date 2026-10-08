@@ -1,0 +1,157 @@
+---
+import Base from '../layouts/Base.astro';
+import { fileVersion } from '../lib/assets';
+import { getVideos } from '../lib/videos';
+
+const videos = getVideos();
+const scriptVersion = fileVersion('public/videos.js');
+---
+
+<Base title="Videos" description="Videos I've edited." noindex={videos.length === 0} wide>
+  <section class="wide page">
+    <header class="intro">
+      <h1>Videos</h1>
+      <p class="muted">Things I've edited. Hover for a preview, click to watch with sound.</p>
+    </header>
+
+    {
+      videos.length === 0 ? (
+        <p class="muted">Nothing here yet.</p>
+      ) : (
+        <ul class="grid">
+          {videos.map((video) => (
+            <li>
+              <a class="frame" href={video.watchUrl} data-video={video.id} data-title={video.title} rel="noopener">
+                <img src={video.poster} alt="" width="640" height="360" loading="lazy" decoding="async" />
+                {video.clip && (
+                  <video src={video.clip} muted loop playsinline preload="none" tabindex="-1" aria-hidden="true" />
+                )}
+                <span class="sr-only">Play {video.title}</span>
+              </a>
+              <div class="caption">
+                <span class="title">{video.title}</span>
+                <span class="year num">{video.year}</span>
+              </div>
+              {video.note && <p class="note">{video.note}</p>}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </section>
+
+  {/* The full video plays here, from YouTube, after a click. */}
+  <dialog class="player" aria-label="Video player">
+    <button class="close" type="button">Close</button>
+    <div class="stage"></div>
+  </dialog>
+
+  <script slot="scripts" is:inline defer src={`/videos.js?v=${scriptVersion}`}></script>
+</Base>
+
+<style>
+  .intro {
+    margin-bottom: var(--space-6);
+  }
+  .intro p {
+    margin: 0;
+  }
+  .grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: var(--space-6) var(--space-5);
+  }
+  .frame {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .frame img,
+  .frame video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* The preview sits on top of the still image and fades in once it is playing. */
+  .frame video {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .frame:global(.playing) video {
+    opacity: 1;
+  }
+  .caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+  }
+  .title {
+    font-weight: var(--weight-medium);
+  }
+  .year {
+    font-size: var(--text-sm);
+    color: var(--muted);
+  }
+  .note {
+    margin: 0;
+    color: var(--muted);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .player {
+    width: min(100% - 2 * var(--gutter), 70rem);
+    max-width: none;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+  }
+  .player::backdrop {
+    background: rgb(0 0 0 / 0.82);
+  }
+  .stage {
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .stage :global(iframe) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .close {
+    display: block;
+    margin: 0 0 var(--space-2) auto;
+    padding: var(--space-2) 0;
+    border: 0;
+    background: none;
+    color: #fff;
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+  @media print {
+    .player {
+      display: none;
+    }
+  }
+</style>

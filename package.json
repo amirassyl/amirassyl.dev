@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "og": "node scripts/generate-og-image.mjs",
-    "deploy": "astro build && wrangler deploy"
+    "deploy": "astro build && wrangler deploy",
+    "clip": "node scripts/make-clip.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

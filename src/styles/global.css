@@ -59,6 +59,7 @@
 
   /* Layout */
   --measure: 38rem; /* width of the single content column */
+  --measure-wide: 64rem; /* width of the video grid */
   --gutter: 1.25rem; /* minimum space left and right of the column */
   --col-label: 9.5rem; /* label column in two-column rows */
 
@@ -181,6 +182,11 @@ a:hover {
 /* The single content column. */
 .wrap {
   width: min(100% - 2 * var(--gutter), var(--measure));
+  margin-inline: auto;
+}
+/* A wider column for pages that need the room, such as the video grid. */
+.wide {
+  width: min(100% - 2 * var(--gutter), var(--measure-wide));
   margin-inline: auto;
 }
 .page {
