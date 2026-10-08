@@ -8,7 +8,7 @@
 // separate resting spot per dot instead of a chain.
 (() => {
   const COLORS = ['#F2AF29', '#2B5490', '#9E382B', '#6E7A68']; // marigold, cobalt, terracotta, sage
-  const COUNT = 5; // keep between 3 and 7
+  const COUNT = [5,10]; // keep between 3 and 7
   const MIN_RADIUS = 3.5;
   const MAX_RADIUS = 6;
   const MIN_DISTANCE = 22; // px from the pointer, so no dot sits under it
