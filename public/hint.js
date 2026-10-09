@@ -1,12 +1,13 @@
 // First-visit hint, like a game showing its controls: a moment after the page
-// loads, the name ripples once on its own and a small pill at the bottom says
+// loads, the name ripples once on its own and a small glass pill at the top says
 // to try pointing at things. It goes away once the visitor points at something
 // that reacts, and is then not shown again on later visits.
 (() => {
   const KEY = 'hinted';
   const TEXT = 'Try pointing at things';
   const DELAY = 1200; // ms after the page is ready before the hint appears
-  const STAY = 8000; // ms it stays if nothing is hovered
+  const STAY = 12000; // ms it stays if nothing is hovered
+  const MIN_SHOWN = 2500; // ms it stays at least, even if they point at something straight away
   const REACTS = '[data-ripple], [data-place], [data-me]';
 
   // Only where there is a mouse to point with.
@@ -26,14 +27,17 @@
   document.body.appendChild(hint);
 
   let hideTimer = 0;
+  let shownAt = 0;
   const hide = () => {
     clearTimeout(hideTimer);
+    if (!hint.classList.contains('shown') && !shownAt) return hint.remove(); // never appeared
     hint.classList.remove('shown');
     setTimeout(() => hint.remove(), 600);
   };
 
   setTimeout(() => {
     hint.classList.add('shown');
+    shownAt = performance.now();
     // The name demonstrates at the same moment.
     const name = document.querySelector('[data-me][data-ripple]');
     if (name) name.dispatchEvent(new CustomEvent('ripple:play'));
@@ -49,7 +53,10 @@
     } catch {
       // storage blocked: nothing to remember
     }
-    hide();
+    // Leave now, or once it has been up long enough to read (also covers pointing before it appeared).
+    clearTimeout(hideTimer);
+    const wait = shownAt ? Math.max(0, MIN_SHOWN - (performance.now() - shownAt)) : DELAY + MIN_SHOWN;
+    hideTimer = setTimeout(hide, wait);
   };
   document.addEventListener('pointerover', learned, { passive: true });
 })();
