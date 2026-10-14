@@ -29,6 +29,29 @@
   --glass-shine: rgb(255 255 255 / 0.85);
   --glass-shadow: rgb(0 0 0 / 0.22);
 
+  /* Pixel Amir in the bottom-right corner: his colours, from the photos */
+  --twin-pixel: 3px; /* one sprite pixel on screen */
+  --twin-hair-line: #24170f;
+  --twin-hair: #3d2a1f;
+  --twin-hair-lit: #5e4333;
+  --twin-skin-line: #a8664a;
+  --twin-skin: #f4c9a4;
+  --twin-skin-shade: #e3ad88;
+  --twin-blush: #f29a8c;
+  --twin-mouth: #b4574a;
+  --twin-eye: #2a1d18;
+  --twin-eye-shine: #ffffff;
+  --twin-glasses: #7d675b;
+  --twin-tee-line: #1b2340;
+  --twin-tee: #f6f3ec;
+  --twin-stripe: #2c3a66;
+  --twin-jeans-line: #161d33;
+  --twin-jeans: #33456f;
+  --twin-jeans-shade: #27375a;
+  --twin-shoe: #ffffff;
+  --twin-shoe-line: #2a2a2a;
+  --twin-rim: transparent; /* a soft edge so his dark hair stays visible at night */
+
   /* Dotted page background */
   --dot: #c2c2b9;
   --dot-size: 1px;
@@ -107,6 +130,7 @@
   --place-kz: #00afca; /* the flag's own blue */
   --place-jp: #ff5a76;
   --place-sf: #f26a4b;
+  --twin-rim: rgb(255 255 255 / 0.22);
   color-scheme: dark;
 }
 
@@ -528,6 +552,147 @@ a[data-ripple]:hover {
 .prose hr {
   border: 0;
   margin: var(--space-6) 0;
+}
+
+/* Pixel Amir (twin.js): stands on the bottom edge of the window; his speech bubble opens above him. */
+.twin {
+  position: fixed;
+  right: var(--space-5);
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+.twin-me {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+.twin-me svg {
+  width: calc(24 * var(--twin-pixel));
+  height: calc(32 * var(--twin-pixel));
+  filter: drop-shadow(0 0 1px var(--twin-rim));
+  animation: twin-breathe 2.4s steps(1) infinite;
+}
+.twin-me:hover svg {
+  transform: translateY(calc(-1 * var(--twin-pixel)));
+}
+/* Breathing: the whole sprite rises one pixel and settles, in a hard pixel step. */
+@keyframes twin-breathe {
+  50% {
+    translate: 0 calc(-1 * var(--twin-pixel));
+  }
+}
+.px-hair-line { fill: var(--twin-hair-line); }
+.px-hair { fill: var(--twin-hair); }
+.px-hair-lit { fill: var(--twin-hair-lit); }
+.px-skin-line { fill: var(--twin-skin-line); }
+.px-skin { fill: var(--twin-skin); }
+.px-skin-shade { fill: var(--twin-skin-shade); }
+.px-blush { fill: var(--twin-blush); }
+.px-mouth { fill: var(--twin-mouth); }
+.px-eye { fill: var(--twin-eye); }
+.px-eye-shine { fill: var(--twin-eye-shine); }
+.px-glasses { fill: var(--twin-glasses); }
+.px-tee-line { fill: var(--twin-tee-line); }
+.px-tee { fill: var(--twin-tee); }
+.px-stripe { fill: var(--twin-stripe); }
+.px-jeans-line { fill: var(--twin-jeans-line); }
+.px-jeans { fill: var(--twin-jeans); }
+.px-jeans-shade { fill: var(--twin-jeans-shade); }
+.px-shoe { fill: var(--twin-shoe); }
+.px-shoe-line { fill: var(--twin-shoe-line); }
+.twin-blink,
+.twin-talk {
+  visibility: hidden;
+}
+.twin.blinking .twin-blink {
+  visibility: visible;
+}
+.twin.talking .twin-talk {
+  animation: twin-mouth 0.2s steps(1) infinite;
+}
+@keyframes twin-mouth {
+  0% { visibility: visible; }
+  50% { visibility: hidden; }
+}
+.twin-bubble {
+  width: min(20rem, calc(100vw - 2 * var(--gutter)));
+  padding: var(--space-3);
+  background: var(--bg);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 24px -12px var(--glass-shadow);
+  font-size: var(--text-sm);
+}
+.twin-bubble[hidden] {
+  display: none;
+}
+.twin-log {
+  max-height: 16rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.twin-line {
+  margin: 0;
+  max-width: 85%;
+  line-height: 1.5;
+  white-space: pre-line; /* his short bursts arrive as separate lines */
+}
+.twin-line.from-visitor {
+  align-self: flex-end;
+  color: var(--muted);
+  text-align: right;
+}
+.twin-form {
+  display: flex;
+  gap: var(--space-2);
+}
+.twin-form input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.twin-form button {
+  width: 2.25rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--text);
+  color: var(--bg);
+  font: inherit;
+  cursor: pointer;
+}
+.twin-note {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+.twin-form input:disabled,
+.twin-form button:disabled {
+  opacity: 0.5;
+}
+@media (max-width: 40rem) {
+  .twin {
+    --twin-pixel: 2px;
+    right: var(--space-4);
+  }
+}
+@media print {
+  .twin {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

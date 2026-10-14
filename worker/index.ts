@@ -1,8 +1,8 @@
-// Redirects www to the apex; everything else is served from static assets.
+// Redirects www to the apex, answers Pixel Amir's chat at /api/chat, and serves
+// everything else from static assets.
+import { handleChat, type ChatEnv } from './chat';
 
-interface Env {
-  ASSETS: { fetch(request: Request): Promise<Response> };
-}
+type Env = ChatEnv;
 
 const APEX = 'amirassyl.dev';
 
@@ -16,6 +16,8 @@ export default {
       url.port = '';
       return Response.redirect(url.toString(), 301);
     }
+
+    if (url.pathname === '/api/chat') return handleChat(request, env);
 
     return env.ASSETS.fetch(request);
   },

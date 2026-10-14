@@ -11,6 +11,13 @@
     // (paths only) cannot match, so the Worker has to see every request.
     "run_worker_first": true
   },
+  // Pixel Amir's chat (/api/chat). Counters are per Cloudflare location; period must be 10 or 60 s.
+  "ratelimits": [
+    // One visitor (by IP): 8 messages a minute.
+    { "name": "CHAT_VISITOR_LIMIT", "namespace_id": "4101", "simple": { "limit": 8, "period": 60 } },
+    // Everyone together: stay under Gemini's free-tier requests per minute.
+    { "name": "CHAT_SITE_LIMIT", "namespace_id": "4102", "simple": { "limit": 12, "period": 60 } }
+  ],
   "routes": [
     { "pattern": "amirassyl.dev", "custom_domain": true },
     { "pattern": "www.amirassyl.dev", "custom_domain": true }
