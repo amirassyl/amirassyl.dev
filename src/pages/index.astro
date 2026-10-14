@@ -85,6 +85,7 @@ const hasVideos = videos.length > 0;
     </section>
   </div>
   <script slot="scripts" is:inline defer src={`/hint.js?v=${fileVersion('public/hint.js')}`}></script>
+  <script slot="scripts" is:inline defer src={`/places.js?v=${fileVersion('public/places.js')}`}></script>
 </Base>
 
 <style>
@@ -96,20 +97,56 @@ const hasVideos = videos.length > 0;
     cursor: default;
   }
   /* Place names take their place's colour when pointed at; trail.js turns the
-     cursor dots into the matching flag (or bridge) at the same time. */
+     cursor dots into the matching flag (or bridge) at the same time. On a touch
+     screen places.js adds .lit on a tap and floats the flag up from the word. */
   .place {
+    position: relative;
     cursor: default;
     white-space: nowrap; /* keep a two-word name on one line, so it is one hover target */
     transition: color 0.25s ease;
   }
-  .place[data-place='kz']:hover {
+  @media (hover: hover) {
+    .place[data-place='kz']:hover {
+      color: var(--place-kz);
+    }
+    .place[data-place='jp']:hover {
+      color: var(--place-jp);
+    }
+    .place[data-place='sf']:hover {
+      color: var(--place-sf);
+    }
+  }
+  .place[data-place='kz']:global(.lit) {
     color: var(--place-kz);
   }
-  .place[data-place='jp']:hover {
+  .place[data-place='jp']:global(.lit) {
     color: var(--place-jp);
   }
-  .place[data-place='sf']:hover {
+  .place[data-place='sf']:global(.lit) {
     color: var(--place-sf);
+  }
+  .place :global(.place-pop) {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    font-size: 1.5rem;
+    line-height: 1;
+    pointer-events: none;
+    animation: place-pop 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+  @keyframes place-pop {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 0.4rem) scale(0.5);
+    }
+    25% {
+      opacity: 1;
+      transform: translate(-50%, -0.4rem) scale(1.15);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -2.2rem) scale(1);
+    }
   }
   .intro p:last-child {
     margin-bottom: 0;
