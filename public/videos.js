@@ -1,11 +1,30 @@
 // Video page: hovering a tile plays its silent preview clip; clicking opens the
-// full video in a player on the page (from YouTube, or from this site for hosted files).
+// full video in a player on the page. On a touch screen there is no hover, so the
+// first tap lifts a tile and plays its preview, and a second tap opens it (from YouTube, or from this site for hosted files).
 // Without this script each tile is still a plain link to the video.
 (() => {
   const dialog = document.querySelector('dialog.player');
   const stage = dialog && dialog.querySelector('.stage');
   const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const lessMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Touch screens: the tile whose preview is showing, waiting for a second tap.
+  let armed = null;
+  const disarm = () => {
+    if (!armed) return;
+    const preview = armed.querySelector('video');
+    armed.classList.remove('armed', 'playing');
+    if (preview) {
+      preview.pause();
+      preview.currentTime = 0;
+    }
+    armed = null;
+  };
+  if (!canHover) {
+    document.addEventListener('click', (event) => {
+      if (!(event.target instanceof Element) || !event.target.closest('.frame')) disarm();
+    });
+  }
 
   for (const frame of document.querySelectorAll('.frame[data-video], .frame[data-file]')) {
     const preview = frame.querySelector('video');
@@ -50,6 +69,23 @@
         // Let modified clicks (new tab, new window) go to YouTube as normal links.
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
         event.preventDefault();
+
+        // Touch: the first tap only lifts the tile and plays its preview; the second opens it.
+        // (Keyboard activation has detail 0 and opens straight away.)
+        if (!canHover && event.detail > 0 && armed !== frame) {
+          disarm();
+          armed = frame;
+          frame.classList.add('armed');
+          if (preview && !lessMotion) {
+            preview.play().then(
+              () => frame.classList.add('playing'),
+              () => {},
+            );
+          }
+          if (navigator.vibrate) navigator.vibrate(8);
+          return;
+        }
+        disarm();
 
         let player;
         if (frame.dataset.file) {

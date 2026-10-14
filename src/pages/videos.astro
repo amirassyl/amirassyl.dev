@@ -109,7 +109,8 @@ const scriptVersion = fileVersion('public/videos.js');
      were picking it up at that point. Without the script it tips back a little,
      and neighbours lean opposite ways. */
   .frame:hover,
-  .frame:focus-visible {
+  .frame:focus-visible,
+  .frame:global(.armed) {
     transform: perspective(60rem) translateY(-0.7rem) rotateX(var(--rx, 5deg)) rotateY(var(--ry, 0deg))
       rotate(var(--tilt, -0.9deg)) scale(1.02);
     box-shadow:
@@ -118,7 +119,8 @@ const scriptVersion = fileVersion('public/videos.js');
   }
   /* At night a shadow cannot be seen, so a lifted sheet also catches a faint light on its edge. */
   :global([data-theme='dark']) .frame:hover,
-  :global([data-theme='dark']) .frame:focus-visible {
+  :global([data-theme='dark']) .frame:focus-visible,
+  :global([data-theme='dark']) .frame:global(.armed) {
     box-shadow:
       0 0 0 1px rgb(255 255 255 / 0.16),
       0 1.6rem 2rem -1rem rgb(0 0 0 / 0.8);
@@ -138,7 +140,8 @@ const scriptVersion = fileVersion('public/videos.js');
       transition: none;
     }
     .frame:hover,
-    .frame:focus-visible {
+    .frame:focus-visible,
+    .frame:global(.armed) {
       transform: none;
     }
   }
