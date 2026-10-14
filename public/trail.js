@@ -332,7 +332,7 @@
     (event) => {
       if (event.pointerType !== 'mouse') return;
       pointer.overText = isOverText(event.clientX, event.clientY);
-      pointer.overMedia = event.target instanceof Element && event.target.closest('.frame, dialog') !== null;
+      pointer.overMedia = event.target instanceof Element && event.target.closest('.frame, dialog, .twin') !== null; // media, dialogs and Pixel Amir (sprite and chat)
       const placeName = event.target instanceof Element ? event.target.closest('[data-place]') : null;
       pointer.place = placeName ? placeName.dataset.place : null;
       const nameElement = event.target instanceof Element ? event.target.closest('[data-me]') : null;
