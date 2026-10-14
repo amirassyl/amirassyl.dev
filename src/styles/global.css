@@ -30,7 +30,9 @@
   --glass-shadow: rgb(0 0 0 / 0.22);
 
   /* Pixel Amir in the bottom-right corner: his colours, from the photos */
-  --twin-pixel: 3px; /* one sprite pixel on screen */
+  --twin-pixel: 3px; /* one sprite pixel on screen; in modern browsers it follows the window (see Pixel Amir below) */
+  --twin-height: 18svh; /* how tall he stands, as a share of the window height */
+  --twin-width-cap: 25vw; /* ...but never taller than this share of the window width */
   --twin-hair-line: #24170f;
   --twin-hair: #3d2a1f;
   --twin-hair-lit: #5e4333;
@@ -791,10 +793,27 @@ a[data-ripple]:hover {
   color: var(--muted);
   white-space: nowrap; /* one line, even on a 320px phone */
 }
+/*
+ * His size follows each visitor's window: about --twin-height of its height,
+ * never more than --twin-width-cap of its width. Pixel art only stays crisp at
+ * whole-pixel sizes, so the size of one sprite pixel is rounded down to whole px.
+ * The sprite is 32 pixels tall. Browsers without CSS round() keep the fixed sizes.
+ */
+@supports (width: round(down, 10px, 1px)) {
+  .twin {
+    --twin-pixel: max(2px, round(down, calc(min(var(--twin-height), var(--twin-width-cap)) / 32), 1px));
+  }
+}
 @media (max-width: 40rem) {
   .twin {
-    --twin-pixel: 2px;
     right: var(--space-4);
+  }
+}
+@supports not (width: round(down, 10px, 1px)) {
+  @media (max-width: 40rem) {
+    .twin {
+      --twin-pixel: 2px;
+    }
   }
 }
 @media print {
