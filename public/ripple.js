@@ -27,7 +27,6 @@
       name.classList.remove('rippling');
       void name.offsetWidth;
       name.classList.add('rippling');
-      window.sound?.play('ripple');
     };
 
     // Start from the letter closest to where the pointer came in.

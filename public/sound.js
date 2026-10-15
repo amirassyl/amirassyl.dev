@@ -5,8 +5,8 @@
 // window.sound.talk(letter); both do nothing while muted.
 //
 // Voices: Pixel Amir is bubble pops (talk, open, reply, error); the chat's own UI and
-// the day/night switch are foley (dots, send, close, dark, light); the name ripple and
-// the dots gathering into the portrait are the smoother "glass" sci-fi pair.
+// the day/night switch are foley (dots, send, close, dark, light); the dots
+// gathering into the portrait are a smooth "glass" sci-fi sound. The name ripple is silent on purpose.
 (() => {
   const KEY = 'sound';
   const VOLUME = 0.7;
@@ -23,7 +23,6 @@
   let master;
   let fx;
   let noiseBuffer;
-  let level = 1; // scales the sound being scheduled right now
 
   // Browsers only let audio start after a tap or key press, so the context is made
   // on demand and resumed by the first one.
@@ -88,7 +87,7 @@
     if (f2) osc.frequency.exponentialRampToValueAtTime(f2, t0 + attack + dur);
     osc.detune.value = detune;
     const gain = ctx.createGain();
-    env(gain, t0, attack, dur, peak * level);
+    env(gain, t0, attack, dur, peak);
     let last = osc;
     if (lp) {
       const filter = ctx.createBiquadFilter();
@@ -125,12 +124,12 @@
       gain.gain.setValueAtTime(0.0001, t0);
       for (let i = 0; i < bumps; i++) {
         const at = t0 + (dur * i) / bumps;
-        gain.gain.linearRampToValueAtTime(peak * level * (0.35 + Math.random() * 0.65), at + 0.006);
-        gain.gain.linearRampToValueAtTime(peak * level * 0.08, at + (dur / bumps) * 0.8);
+        gain.gain.linearRampToValueAtTime(peak * (0.35 + Math.random() * 0.65), at + 0.006);
+        gain.gain.linearRampToValueAtTime(peak * 0.08, at + (dur / bumps) * 0.8);
       }
       gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     } else {
-      env(gain, t0, attack, dur, peak * level);
+      env(gain, t0, attack, dur, peak);
     }
     source.connect(filter);
     filter.connect(gain);
@@ -189,13 +188,6 @@
       tick(0, 0.16);
       wood(240, 0.02, 0.2, 0.1);
     },
-    // Glass: a rising swell, an airy sweep, then pings that echo away.
-    ripple() {
-      tone({ f: 330, f2: 990, dur: 0.7, attack: 0.16, peak: 0.08, wet: 0.5 });
-      tone({ f: 497, f2: 1485, dur: 0.7, attack: 0.2, peak: 0.045, detune: 7, wet: 0.5 });
-      noise({ f: 600, f2: 5200, q: 3, dur: 0.8, attack: 0.22, peak: 0.05, wet: 0.4 });
-      [1319, 1760, 2637].forEach((f, i) => tone({ t: 0.2 + i * 0.11, f, dur: 0.55, peak: 0.05, attack: 0.01, wet: 0.7 }));
-    },
     // Glass: air rushes inward and a soft chord blooms as the portrait forms.
     gather() {
       noise({ f: 6000, f2: 900, q: 4, dur: 0.7, attack: 0.25, peak: 0.07, wet: 0.3 });
@@ -210,7 +202,7 @@
   };
 
   // Shortest time between two plays of the same sound, so hovering back and forth never machine-guns.
-  const MIN_GAP = { ripple: 350, gather: 900 };
+  const MIN_GAP = { gather: 900 };
   const lastPlayed = {};
   const since = (name) => performance.now() - (lastPlayed[name] ?? -1e9);
 
@@ -219,10 +211,7 @@
     if (!sound || !ready()) return;
     if (since(name) < (MIN_GAP[name] ?? 0)) return;
     lastPlayed[name] = performance.now();
-    // Pointing at the name starts a ripple and a gather together; keep the gather underneath.
-    level = name === 'gather' && since('ripple') < 300 ? 0.6 : 1;
     sound();
-    level = 1;
   }
 
   // While Pixel Amir types, one soft pop for every handful of letters. The note comes from the letter.
@@ -231,7 +220,6 @@
     if (!letter || !/\p{L}/u.test(letter) || !ready() || since('talk') < 90) return;
     lastPlayed.talk = performance.now();
     const code = letter.toLowerCase().codePointAt(0);
-    level = 1;
     pop(520 * semi(PENTATONIC[code % 5] + 12 * ((code >> 2) % 2)), 0, 0.12, 0.06);
   }
 
