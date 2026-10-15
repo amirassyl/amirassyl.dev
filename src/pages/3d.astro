@@ -1,0 +1,239 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="3D world" description="A small Ghibli-inspired 3D world where Pixel Amir can change the ground, the sky and the weather for you." bare>
+  <div id="world" class="world">
+    <p class="world-loading">Growing the world…</p>
+    <div class="world-unsupported" hidden>
+      <p>This browser can't draw the 3D world (it needs WebGL2).</p>
+      <p><a href="/">Back to the 2D site</a></p>
+    </div>
+    <noscript><p class="world-unsupported">The 3D world needs JavaScript. <a href="/">Back to the 2D site</a></p></noscript>
+  </div>
+  <div class="world-veil" aria-hidden="true"></div>
+</Base>
+
+<script>
+  import '../world3d/mount';
+</script>
+
+<style is:global>
+  /* The page itself never scrolls: the world fills the window. */
+  html:has(.world),
+  html:has(.world) body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  html:has(.world) body::before {
+    display: none;
+  }
+  .world {
+    position: fixed;
+    inset: 0;
+    touch-action: none;
+  }
+  .world-canvas {
+    position: absolute !important;
+    inset: 0;
+    cursor: grab;
+  }
+  .world-canvas:active {
+    cursor: grabbing;
+  }
+  .world-loading,
+  .world-unsupported {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: var(--space-2);
+    margin: 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: var(--text-sm);
+  }
+  .world-unsupported[hidden] {
+    display: none;
+  }
+  .world-unsupported p {
+    margin: 0;
+  }
+  /* Continues the ladybug's dive from the home page, then clears once the world is drawn. */
+  .world-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+    background: var(--world-veil, var(--bg));
+    transition: opacity 0.7s ease;
+  }
+  :root {
+    --world-veil: #cde8f5;
+  }
+  :root[data-theme='dark'] {
+    --world-veil: #132649;
+  }
+  .world-ready .world-veil {
+    opacity: 0;
+  }
+
+  /* Chat along the bottom, in the site's quiet style. */
+  .world-chat {
+    position: fixed;
+    left: 50%;
+    bottom: max(var(--space-4), env(safe-area-inset-bottom));
+    z-index: 4;
+    width: min(34rem, calc(100% - 2 * var(--space-4)));
+    transform: translateX(-50%);
+    display: grid;
+    gap: var(--space-2);
+  }
+  .world-log {
+    display: grid;
+    gap: var(--space-1);
+    max-height: 9.5rem;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .world-msg {
+    margin: 0;
+    max-width: 85%;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--twin-radius);
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+    white-space: pre-line;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    color: var(--text);
+    box-shadow: 0 1px 6px var(--glass-shadow);
+    backdrop-filter: blur(6px);
+  }
+  .world-msg.from-you {
+    justify-self: end;
+    background: color-mix(in srgb, var(--text) 82%, transparent);
+    color: var(--bg);
+  }
+  .world-typing {
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    animation: world-typing 1.2s ease-in-out infinite;
+  }
+  @keyframes world-typing {
+    50% {
+      opacity: 0.35;
+    }
+  }
+  .world-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+  .world-chips button,
+  .world-form {
+    border: var(--border);
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(6px);
+    color: var(--text);
+  }
+  .world-chips button {
+    padding: var(--space-1) var(--space-3);
+    border-radius: 999px;
+    font: inherit;
+    font-size: var(--text-xs);
+    cursor: pointer;
+    transition: border-color var(--transition);
+  }
+  .world-chips button:hover {
+    border-color: var(--muted);
+  }
+  .world-form {
+    display: flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0 var(--space-1) 0 var(--space-4);
+  }
+  .world-form input {
+    flex: 1;
+    min-width: 0;
+    height: 2.75rem;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: var(--text-sm);
+  }
+  .world-form input:focus {
+    outline: none;
+  }
+  .world-form:focus-within {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+  .world-form button,
+  .world-jump {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--bg);
+    cursor: pointer;
+  }
+  .world-form button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .world-form svg,
+  .world-jump svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Touch: a joystick on the left and a jump button on the right, above the chat. */
+  .world-stick {
+    position: fixed;
+    left: var(--space-5);
+    bottom: calc(var(--space-4) + 9rem);
+    z-index: 4;
+    width: 7rem;
+    height: 7rem;
+    border-radius: 50%;
+    border: var(--border);
+    background: color-mix(in srgb, var(--bg) 35%, transparent);
+    display: grid;
+    place-items: center;
+    touch-action: none;
+  }
+  .world-stick span {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    box-shadow: 0 1px 6px var(--glass-shadow);
+  }
+  .world-jump {
+    position: fixed;
+    right: var(--space-5);
+    bottom: calc(var(--space-4) + 10.5rem);
+    z-index: 4;
+    width: 3.75rem;
+    height: 3.75rem;
+    opacity: 0.85;
+    touch-action: none;
+  }
+  .corner .back-2d {
+    width: auto;
+    padding: 0 var(--space-3);
+    border-radius: 999px;
+    font-size: var(--text-xs);
+    text-decoration: none;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+  }
+</style>
