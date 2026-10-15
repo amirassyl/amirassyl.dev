@@ -9,9 +9,19 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build
 npm run check
+npm test         # vitest: world schema, reducer, fallback parser, /api/world
 ```
 
 Content lives in `src/data/site.ts` and `src/content/`.
+
+## The 3D world (/3d/)
+
+An optional 3D world. The 2D site stays the default; the ladybug on my name (`public/ladybug.js`, home page only) is the way in.
+
+- `src/world/` is the world as data: the zod schema (`schema.ts`), the tools Pixel Amir can call (`tools.ts`), the reducer that turns a tool call into the next state (`reducer.ts`) and the keyword fallback (`intent.ts`). Shared by the browser and the Worker.
+- `src/world3d/` is the renderer: React Three Fiber, custom GLSL for the grass, ground, sky and weather, Rapier for walking and jumping. Only `/3d/` loads it.
+- `worker/world.ts` answers `POST /api/world` with Gemini function calling, streamed as NDJSON. Without `GEMINI_API_KEY` it answers 503 and the page uses the fallback parser, so `npm run dev` works with no key. To try the real model locally: put `GEMINI_API_KEY=...` in `.dev.vars`, then `npm run build && npx wrangler dev`.
+- The Worker adds `'wasm-unsafe-eval'` to the CSP of `/3d/` only, because Rapier is WebAssembly.
 
 ## Deploying
 
