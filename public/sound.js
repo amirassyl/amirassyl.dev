@@ -6,7 +6,7 @@
 //
 // Voices: Pixel Amir is bubble pops (talk, open, reply, error); the chat's own UI and
 // the day/night switch are foley (dots, send, close, dark, light); the dots
-// gathering into the portrait are a smooth "glass" sci-fi sound. The name ripple is silent on purpose.
+// gathering into the portrait are a smooth "glass" whoosh. The name ripple is silent on purpose.
 (() => {
   const KEY = 'sound';
   const VOLUME = 0.7;
@@ -201,11 +201,10 @@
       tick(0, 0.16);
       wood(240, 0.02, 0.2, 0.1);
     },
-    // Glass: air rushes inward and a soft chord blooms as the portrait forms.
+    // Glass: air rushes inward as the portrait forms. Just the whoosh, with no chime at the end.
     gather() {
       noise({ f: 6000, f2: 900, q: 4, dur: 0.7, attack: 0.25, peak: 0.07, wet: 0.3 });
       tone({ f: 180, f2: 540, dur: 0.6, attack: 0.2, peak: 0.08, lp: 1400 });
-      [523, 784, 1047].forEach((f) => tone({ t: 0.45, f, dur: 0.8, attack: 0.04, peak: 0.05, wet: 0.5 }));
     },
     // Confirms the speaker was switched on: one short, soft rising blip.
     on() {
