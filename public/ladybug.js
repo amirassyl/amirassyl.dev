@@ -1,6 +1,6 @@
 // The way into the 3D world: a tiny glossy ladybug flies in and lands on my
-// name. It's a real button; clicking it (or Enter) dives into /3d/. Plain SVG
-// and CSS, so the home page never downloads three.js for it. Only the home
+// name. It's a real button; clicking it (or Enter) dives into /3d/. Two small
+// rendered images and CSS, so the home page never downloads three.js for it. Only the home
 // page loads this file.
 //
 // Less motion: no flight and no twitching, the ladybug just sits on the name.
@@ -19,62 +19,33 @@
   };
 
   const css = `
-.ladybug{position:absolute;z-index:3;width:30px;height:30px;margin:0;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.ladybug:focus-visible{outline:var(--focus-ring);outline-offset:2px}
-.ladybug svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 1.5px 1.2px rgb(0 0 0/.28));transform:rotate(var(--lb-turn,76deg));transition:transform .3s}
-.ladybug:hover svg{transform:rotate(var(--lb-turn,76deg)) scale(1.12)}
-.lb-shell{transition:transform .18s ease-out;transform-box:fill-box}
-.lb-l{transform-origin:100% 8%}.lb-r{transform-origin:0 8%}
-.ladybug.twitch .lb-l{transform:rotate(-9deg)}.ladybug.twitch .lb-r{transform:rotate(9deg)}
-.lb-wing{opacity:0;transform-box:fill-box;transition:opacity .15s}
-.ladybug.flying .lb-l{transform:rotate(-34deg)}.ladybug.flying .lb-r{transform:rotate(34deg)}
-.ladybug.flying .lb-wing{opacity:.55;animation:lb-flap 70ms linear infinite alternate}
-.lb-wl{transform-origin:100% 0}.lb-wr{transform-origin:0 0}
-@keyframes lb-flap{to{transform:scaleY(.55)}}
+.ladybug{position:absolute;z-index:3;width:26px;height:26px;margin:0;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ladybug:focus-visible{outline:var(--focus-ring);outline-offset:3px}
+.ladybug img{position:absolute;pointer-events:none;user-select:none;transform:rotate(var(--lb-turn,76deg));transition:transform .3s,opacity .12s}
+.lb-closed{inset:0;width:100%;height:100%;filter:drop-shadow(0 1.5px 1.2px rgb(0 0 0/.3))}
+.lb-open{left:-26.5%;top:-26.5%;width:153%;height:153%;opacity:0;filter:drop-shadow(0 4px 3px rgb(0 0 0/.18))}
+.ladybug:hover .lb-closed{transform:rotate(var(--lb-turn,76deg)) scale(1.12)}
+.ladybug.twitch .lb-closed{transform:rotate(var(--lb-turn,76deg)) scale(1.05,.95)}
+.ladybug.flying .lb-closed{opacity:0}
+.ladybug.flying .lb-open{opacity:1;animation:lb-buzz 50ms linear infinite alternate}
+@keyframes lb-buzz{to{transform:rotate(var(--lb-turn,76deg)) scale(1.03,.97)}}
 .ladybug-back{position:absolute;z-index:3;font-size:var(--text-xs);color:var(--muted);white-space:nowrap;text-decoration-color:transparent}
 .ladybug-back:hover{color:var(--text);text-decoration-color:currentColor}
-.ladybug-veil{position:fixed;inset:0;z-index:20;pointer-events:none;background:#cde8f5}
-[data-theme=dark] .ladybug-veil{background:#132649}
-[data-theme=dark] .ladybug svg{filter:drop-shadow(0 0 1px rgb(255 255 255/.45)) drop-shadow(0 1.5px 1.2px rgb(0 0 0/.5))}`;
+.ladybug-veil{position:fixed;inset:0;z-index:20;pointer-events:none;background:#e2e1d6}
+[data-theme=dark] .ladybug-veil{background:#16232f}
+[data-theme=dark] .lb-closed{filter:drop-shadow(0 0 1px rgb(255 255 255/.35)) drop-shadow(0 1.5px 1.2px rgb(0 0 0/.5))}`;
   const style = document.createElement('style');
   style.textContent = css;
   document.head.append(style);
 
-  // Drawn with the head at the top; the button turns it to face along the name.
-  const spots = (side) =>
-    [
-      [4.2, -4, 2.3],
-      [7.6, 2.5, 2.1],
-      [3.8, 7.5, 2],
-    ]
-      .map(([x, y, r]) => `<circle cx="${x * side}" cy="${y}" r="${r}" fill="#1a1414"/>`)
-      .join('');
-  const half = (side) =>
-    `<g class="lb-shell lb-${side < 0 ? 'l' : 'r'}"><path d="M0 -7.5C${6 * side} -7.5 ${11 * side} -3 ${11 * side} 2.5C${11 * side} 9 ${6 * side} 13 0 13Z" fill="url(#lb-red)"/>${spots(side)}${
-      side < 0
-        ? '<ellipse cx="-5" cy="-3" rx="3.6" ry="2" transform="rotate(-35 -5 -3)" fill="url(#lb-gloss)"/><circle cx="-6.2" cy="-3.8" r=".9" fill="#fff"/>'
-        : '<ellipse cx="6" cy="6" rx="2.2" ry="1.1" transform="rotate(-50 6 6)" fill="#fff" opacity=".22"/>'
-    }</g>`;
-  const svg = `<svg viewBox="-16 -18 32 34" aria-hidden="true" focusable="false">
-<defs>
-<radialGradient id="lb-red" cx="35%" cy="25%" r="85%"><stop offset="0" stop-color="#ff8a74"/><stop offset=".35" stop-color="#ec2a21"/><stop offset=".8" stop-color="#b3110f"/><stop offset="1" stop-color="#6e0709"/></radialGradient>
-<linearGradient id="lb-gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<radialGradient id="lb-head" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#4a4446"/><stop offset="1" stop-color="#0d0b0c"/></radialGradient>
-</defs>
-<g stroke="#1a1414" stroke-width="1.3" stroke-linecap="round" fill="none"><path d="M-9 -2l-4 -2M-10 4l-4.5 0.5M-8 9l-3.5 3M9 -2l4 -2M10 4l4.5 0.5M8 9l3.5 3"/><path d="M-2 -12q-2 -4 -5 -5M2 -12q2 -4 5 -5"/></g>
-<ellipse class="lb-wing lb-wl" cx="-8" cy="6" rx="5" ry="10" fill="#e9eef5"/><ellipse class="lb-wing lb-wr" cx="8" cy="6" rx="5" ry="10" fill="#e9eef5"/>
-<ellipse cx="0" cy="-9" rx="6" ry="4.6" fill="url(#lb-head)"/>
-<circle cx="-3" cy="-10.6" r="1.1" fill="#fff"/><circle cx="3" cy="-10.6" r="1.1" fill="#fff"/>
-${half(-1)}${half(1)}
-<path d="M0 -7.5V13" stroke="#3a0a0a" stroke-width=".7"/>
-</svg>`;
-
+  // Two renders of a glossy seven-spot ladybug (made in Blender, head up): sitting, and taking off.
+  const sprite = (kind) => `<img class="lb-${kind}" src="/ladybug/${kind}.webp" alt="" width="26" height="26" decoding="async" draggable="false">`;
   const bug = document.createElement('button');
   bug.type = 'button';
   bug.className = 'ladybug';
   bug.setAttribute('aria-label', "Enter Amir's 3D world");
   bug.title = "Enter Amir's 3D world";
-  bug.innerHTML = svg;
+  bug.innerHTML = sprite('closed') + sprite('open');
   name.after(bug);
 
   let back = null;
@@ -86,16 +57,16 @@ ${half(-1)}${half(1)}
     bug.after(back);
   }
 
-  // Sit on the top edge of the name, near its end.
+  // Perch just after the name, so it never covers a letter.
   function place() {
     const box = name.getBoundingClientRect();
     const parent = bug.offsetParent?.getBoundingClientRect() ?? { left: -scrollX, top: -scrollY };
-    const x = box.left - parent.left + box.width * 0.78;
-    const y = box.top - parent.top - 18;
-    bug.style.left = `${x - 15}px`;
+    const x = box.right - parent.left + 6;
+    const y = box.top - parent.top + (box.height - 26) / 2 - 3;
+    bug.style.left = `${x}px`;
     bug.style.top = `${y}px`;
     if (back) {
-      back.style.left = `${box.right - parent.left + 22}px`;
+      back.style.left = `${box.right - parent.left + 40}px`;
       back.style.top = `${box.top - parent.top + 2}px`;
     }
     return { x, y };
