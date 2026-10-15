@@ -1,6 +1,7 @@
-// Redirects www to the apex, answers Pixel Amir's chat at /api/chat, and serves
-// everything else from static assets.
+// Redirects www to the apex, answers Pixel Amir's chat at /api/chat and his 3D
+// world at /api/world, and serves everything else from static assets.
 import { handleChat, type ChatEnv } from './chat';
+import { handleWorld } from './world';
 
 type Env = ChatEnv;
 
@@ -18,6 +19,7 @@ export default {
     }
 
     if (url.pathname === '/api/chat') return handleChat(request, env);
+    if (url.pathname === '/api/world') return handleWorld(request, env);
 
     return env.ASSETS.fetch(request);
   },
