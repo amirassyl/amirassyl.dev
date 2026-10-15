@@ -154,6 +154,13 @@
     noise({ t, dur: 0.02, peak: peak * 0.6, f: f * 6, q: 2 });
   };
 
+  // The typing-dots ticks wait on timers, so they can be dropped when Pixel Amir starts to talk.
+  let dotTimers = [];
+  function cancelDots() {
+    dotTimers.forEach(clearTimeout);
+    dotTimers = [];
+  }
+
   const SOUNDS = {
     // Pixel Amir: bubble pops.
     open() {
@@ -169,8 +176,14 @@
       pop(220, 0.14, 0.3, 0.14);
     },
     // The chat's own UI and the day/night switch: foley.
+    // Three ticks, started a beat after the send sound. Pixel Amir's first letter or his reply cancels the rest.
     dots() {
-      [0, 0.14, 0.28].forEach((t) => tick(t, 0.09));
+      cancelDots();
+      for (const ms of [320, 460, 600]) {
+        dotTimers.push(setTimeout(() => {
+          if (ready()) tick(0, 0.09);
+        }, ms));
+      }
     },
     send() {
       wood(220, 0, 0.26, 0.1);
@@ -194,15 +207,16 @@
       tone({ f: 180, f2: 540, dur: 0.6, attack: 0.2, peak: 0.08, lp: 1400 });
       [523, 784, 1047].forEach((f) => tone({ t: 0.45, f, dur: 0.8, attack: 0.04, peak: 0.05, wet: 0.5 }));
     },
-    // Confirms the speaker was switched on.
+    // Confirms the speaker was switched on: one short, soft rising blip.
     on() {
-      tone({ f: 1319, dur: 0.5, peak: 0.08, attack: 0.01, wet: 0.7 });
-      tone({ t: 0.1, f: 1760, dur: 0.6, peak: 0.07, attack: 0.01, wet: 0.7 });
+      tone({ f: 740, f2: 880, dur: 0.12, peak: 0.04, attack: 0.012, lp: 2000 });
     },
   };
 
   // Shortest time between two plays of the same sound, so hovering back and forth never machine-guns.
   const MIN_GAP = { gather: 900 };
+  // Sounds that mean the chat is no longer waiting, so the typing ticks stop.
+  const ENDS_WAIT = new Set(['open', 'reply', 'error', 'close']);
   const lastPlayed = {};
   const since = (name) => performance.now() - (lastPlayed[name] ?? -1e9);
 
@@ -211,6 +225,7 @@
     if (!sound || !ready()) return;
     if (since(name) < (MIN_GAP[name] ?? 0)) return;
     lastPlayed[name] = performance.now();
+    if (ENDS_WAIT.has(name)) cancelDots();
     sound();
   }
 
@@ -219,6 +234,7 @@
   function talk(letter) {
     if (!letter || !/\p{L}/u.test(letter) || !ready() || since('talk') < 90) return;
     lastPlayed.talk = performance.now();
+    cancelDots();
     const code = letter.toLowerCase().codePointAt(0);
     pop(520 * semi(PENTATONIC[code % 5] + 12 * ((code >> 2) % 2)), 0, 0.12, 0.06);
   }
