@@ -1,11 +1,12 @@
 // First-visit hint, like a game showing its controls: a moment after the page
 // loads, the name ripples once on its own and a small glass pill at the top says
-// to try pointing at things (or tapping, on a touch screen). It goes away once the visitor points at something
-// that reacts, and is then not shown again on later visits.
+// to try pointing at things (or tapping, on a touch screen), and, while sound is still off, where to turn it on.
+// It goes away once the visitor points at something that reacts, and is then not shown again on later visits.
 (() => {
   const KEY = 'hinted';
   const TEXT = 'Try pointing at things';
   const TEXT_TOUCH = 'Try tapping things';
+  const TEXT_SOUND = 'Sound is off, top right';
   const DELAY = 1200; // ms after the page is ready before the hint appears
   const STAY = 12000; // ms it stays if nothing is hovered
   const MIN_SHOWN = 2500; // ms it stays at least, even if they point at something straight away
@@ -25,7 +26,23 @@
   hint.innerHTML = touch
     ? '<svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="2.5"/><circle cx="12" cy="12" r="7"/></svg>'
     : '<svg viewBox="0 0 24 24" width="16" height="16"><rect x="7" y="3" width="10" height="18" rx="5"/><path d="M12 7v3"/></svg>';
-  hint.append(touch ? TEXT_TOUCH : TEXT);
+  const lines = document.createElement('span');
+  lines.className = 'hint-lines';
+  lines.append(touch ? TEXT_TOUCH : TEXT);
+  // Sound starts muted, so the hint also says where the speaker is (not if they already turned it on).
+  let soundOn = false;
+  try {
+    soundOn = localStorage.getItem('sound') === 'on';
+  } catch {
+    // storage blocked: sound is off
+  }
+  if (!soundOn) {
+    const sound = document.createElement('span');
+    sound.className = 'hint-sound';
+    sound.textContent = TEXT_SOUND;
+    lines.append(sound);
+  }
+  hint.append(lines);
   document.body.appendChild(hint);
 
   let hideTimer = 0;

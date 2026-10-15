@@ -81,6 +81,7 @@
     if (!button) return;
     button.addEventListener('click', () => {
       const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      window.sound?.play(next);
       try {
         // Choosing what the system already says goes back to following the system.
         if (next === systemTheme()) localStorage.removeItem(KEY);

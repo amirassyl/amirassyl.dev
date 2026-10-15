@@ -33,6 +33,7 @@ const image = new URL(defaultImage.path, origin);
 const trailVersion = fileVersion('public/trail.js');
 const rippleVersion = fileVersion('public/ripple.js');
 const themeVersion = fileVersion('public/theme.js');
+const soundVersion = fileVersion('public/sound.js');
 const twinVersion = fileVersion('public/twin.js');
 const portraitVersion = fileVersion('public/me.jpg');
 const hasVideos = videos.length > 0;
@@ -89,6 +90,16 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
           <path d="M14 3v4h4M9 12h6M9 15.5h6" />
         </svg>
       </a>
+      <button class="sound-toggle" type="button" aria-label="Turn sound on" aria-pressed="false">
+        <svg class="muted" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M11 5 6.5 9h-3v6h3L11 19Z" />
+          <path d="m16 9.5 5 5M21 9.5l-5 5" />
+        </svg>
+        <svg class="loud" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M11 5 6.5 9h-3v6h3L11 19Z" />
+          <path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" />
+        </svg>
+      </button>
       <button class="theme-toggle" type="button" aria-label="Switch to night mode" aria-pressed="false">
         <svg class="moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
           <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />
@@ -118,6 +129,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     <main id="main">
       <slot />
     </main>
+    <script is:inline defer src={`/sound.js?v=${soundVersion}`}></script>
     <script is:inline defer src={`/trail.js?v=${trailVersion}`} data-portrait={`/me.jpg?v=${portraitVersion}`}></script>
     <script is:inline defer src={`/ripple.js?v=${rippleVersion}`}></script>
     <script is:inline defer src={`/twin.js?v=${twinVersion}`}></script>
@@ -149,6 +161,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     gap: var(--space-1);
   }
   .corner-link,
+  .sound-toggle,
   .theme-toggle {
     display: grid;
     place-items: center;
@@ -164,6 +177,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
   }
   .corner-link:hover,
   .corner-link[aria-current='page'],
+  .sound-toggle:hover,
   .theme-toggle:hover {
     color: var(--text);
   }
@@ -173,6 +187,14 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     stroke-width: 1.6;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+  /* The speaker is crossed out while sound is off and gives off waves while it is on. */
+  .sound-toggle .loud,
+  :global([data-sound='on']) .sound-toggle .muted {
+    display: none;
+  }
+  :global([data-sound='on']) .sound-toggle .loud {
+    display: block;
   }
   /* Show the moon by day (press for night) and the sun by night. */
   .theme-toggle .sun,

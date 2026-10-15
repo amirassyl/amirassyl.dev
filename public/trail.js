@@ -336,7 +336,9 @@
       const placeName = event.target instanceof Element ? event.target.closest('[data-place]') : null;
       pointer.place = placeName ? placeName.dataset.place : null;
       const nameElement = event.target instanceof Element ? event.target.closest('[data-me]') : null;
+      const wasOnName = pointer.me;
       pointer.me = nameElement !== null;
+      if (pointer.me && !wasOnName) window.sound?.play('gather');
       if (nameElement) {
         // Left of the name, level with it; kept while the photo fades after leaving.
         const box = nameElement.getBoundingClientRect();

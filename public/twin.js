@@ -182,7 +182,7 @@
   // a finished string or a stream that is still arriving; typing keeps up with it.
   // Each line of the reply gets its own bubble, the way Amir sends short bursts.
   // `dots` (if given) stays until the first letter appears.
-  async function speak(source, dots) {
+  async function speak(source, dots, isError = false) {
     let received = '';
     let finished = false;
     const reading = (async () => {
@@ -224,6 +224,7 @@
         if (shown < chars.length) {
           shown++;
           show(chars.slice(0, shown).join(''));
+          window.sound?.talk(chars[shown - 1]);
           await wait(22);
         } else if (finished) {
           break;
@@ -235,6 +236,7 @@
       await reading.catch(() => {});
     }
     dots?.remove();
+    if (received.trim()) window.sound?.play(isError ? 'error' : 'reply');
     return received;
   }
 
@@ -261,10 +263,12 @@
     busy = true;
     chips.hidden = true;
     say(text, 'visitor');
+    window.sound?.play('send');
     history.push({ role: 'user', text });
     input.value = '';
     input.disabled = true;
     const dots = typingDots();
+    window.sound?.play('dots');
     const { stream, fallback } = await ask();
     const reply = stream ? await speak(stream, dots) : '';
     if (reply.trim()) {
@@ -272,7 +276,7 @@
     } else {
       // No real reply: say something in character, and forget the message so it can be sent again.
       history.pop();
-      await speak(fallback ?? NOT_SURE, dots);
+      await speak(fallback ?? NOT_SURE, dots, true);
     }
     input.disabled = false;
     busy = false;
@@ -282,6 +286,7 @@
   function open(isOpen) {
     bubble.hidden = !isOpen;
     me.setAttribute('aria-expanded', String(isOpen));
+    window.sound?.play(isOpen ? 'open' : 'close');
     if (!isOpen) return;
     wave();
     if (!log.childElementCount) {
