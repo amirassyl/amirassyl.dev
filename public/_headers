@@ -45,3 +45,5 @@
   Cache-Control: public, max-age=86400
 /hint.js
   Cache-Control: public, max-age=3600
+/ladybug.js
+  Cache-Control: public, max-age=3600
