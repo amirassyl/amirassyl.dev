@@ -93,3 +93,12 @@ describe('parseIntent (fallback)', () => {
     expect(replyForCalls(parseIntent('rain', world).calls)).toMatch(/rain/i);
   });
 });
+
+describe('asking for what is already there', () => {
+  it('says so instead of "I can\'t do that"', () => {
+    const grassy = after('grass');
+    const again = parseIntent('grass', grassy);
+    expect(again.calls).toHaveLength(0);
+    expect(again.reply).not.toMatch(/can't do that/);
+  });
+});

@@ -42,6 +42,7 @@ const REPLIES = {
   highGravity: ['Heavy mode😭'],
   normalGravity: ['Back to normal gravity'],
   reset: ['Back to the start!!', 'Okii fresh world'],
+  already: ['Already done!! look around🌿', 'Its already like that ahahah'],
   unknown: [
     "Hmm I can't do that one yet🙏🏻 try 'grass', 'make it rain' or 'night with fireflies'",
     "I only know a few spells rn ahahah try 'golden hour' or 'low gravity'",
@@ -182,7 +183,8 @@ export function parseIntent(prompt: string, state: WorldState): Intent {
   const gravity = calls.find((call) => call.name === 'setGravity');
   if (gravity?.name === 'setGravity') replies.push(gravity.args.scale < 1 ? 'lowGravity' : gravity.args.scale > 1 ? 'highGravity' : 'normalGravity');
 
-  if (!calls.length) return { calls, reply: pick('unknown', seed) };
+  // Asked for what's already there: say so, instead of claiming not to know it.
+  if (!calls.length) return { calls, reply: replies.length ? pick('already', seed) : pick('unknown', seed) };
   // Two short lines at most, like his texts.
   const unique = [...new Set(replies)].slice(0, 2);
   return { calls, reply: unique.map((key) => pick(key, seed)).join('\n') };

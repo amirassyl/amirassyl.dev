@@ -21,18 +21,6 @@ export default {
     if (url.pathname === '/api/chat') return handleChat(request, env);
     if (url.pathname === '/api/world') return handleWorld(request, env);
 
-    const response = await env.ASSETS.fetch(request);
-    // The 3D world's physics engine is WebAssembly, which the site-wide CSP blocks.
-    // Only that page gets 'wasm-unsafe-eval'; every other page keeps the strict policy.
-    if (url.pathname === '/3d/') return allowWasm(response);
-    return response;
+    return env.ASSETS.fetch(request);
   },
 };
-
-export function allowWasm(response: Response): Response {
-  const csp = response.headers.get('Content-Security-Policy');
-  if (!csp) return response;
-  const copy = new Response(response.body, response);
-  copy.headers.set('Content-Security-Policy', csp.replace("script-src 'self'", "script-src 'self' 'wasm-unsafe-eval'"));
-  return copy;
-}

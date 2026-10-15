@@ -20,20 +20,21 @@ interface Palette {
   stars: number;
 }
 
-// Warm afternoon by day, moonlit blue at night; Ghibli-ish skies in between.
+// A filmic steppe (see the art direction note): soft overcast light by day, a warm
+// haze at golden hour, a deep blue-green night. Low contrast, slightly muted.
 const PALETTES: Record<TimeOfDay, Palette> = {
-  dawn: { top: '#6c8fd2', horizon: '#f8c7a4', fog: '#ecd3c2', sun: '#ffc9a3', sunDir: [0.75, 0.16, -0.5], sunIntensity: 1.9, ambient: '#b9b3d6', ambientIntensity: 0.95, cloudLit: '#fff0e4', cloudShade: '#a493bf', stars: 0.08 },
-  day: { top: '#3d8ce0', horizon: '#cde8f5', fog: '#d4eaf3', sun: '#fff1d6', sunDir: [0.45, 0.62, -0.62], sunIntensity: 2.4, ambient: '#c4dcf0', ambientIntensity: 1.05, cloudLit: '#ffffff', cloudShade: '#a8bad6', stars: 0 },
-  golden: { top: '#5a8bd0', horizon: '#ffd08c', fog: '#f3d6a6', sun: '#ffb45e', sunDir: [0.68, 0.2, -0.7], sunIntensity: 2.5, ambient: '#d9c0a8', ambientIntensity: 0.9, cloudLit: '#fff1c9', cloudShade: '#c78f7d', stars: 0 },
-  dusk: { top: '#2b3470', horizon: '#ef8a6c', fog: '#a6788e', sun: '#ff8d5e', sunDir: [0.8, 0.06, -0.6], sunIntensity: 1.5, ambient: '#7f6f9e', ambientIntensity: 0.8, cloudLit: '#ffb391', cloudShade: '#5b4a7c', stars: 0.35 },
-  night: { top: '#06102a', horizon: '#1d3a6c', fog: '#132649', sun: '#a9c4ff', sunDir: [-0.42, 0.55, -0.72], sunIntensity: 0.95, ambient: '#3c5a98', ambientIntensity: 0.7, cloudLit: '#4b679b', cloudShade: '#17264b', stars: 1 },
+  dawn: { top: '#a9b4c4', horizon: '#ecd6c6', fog: '#dcd2c8', sun: '#ffd9bd', sunDir: [0.75, 0.14, -0.5], sunIntensity: 1.3, ambient: '#c9c6cf', ambientIntensity: 1.15, cloudLit: '#f4e9e1', cloudShade: '#8f8e9c', stars: 0.05 },
+  day: { top: '#9eaaa9', horizon: '#e2e1d6', fog: '#d3d6cc', sun: '#fff6e6', sunDir: [0.4, 0.55, -0.7], sunIntensity: 1.25, ambient: '#d8ddd6', ambientIntensity: 1.3, cloudLit: '#f1f0ea', cloudShade: '#8d9592', stars: 0 },
+  golden: { top: '#93a6b0', horizon: '#f1d6a6', fog: '#e4d3b1', sun: '#ffc77e', sunDir: [0.68, 0.16, -0.7], sunIntensity: 1.9, ambient: '#d9c8ae', ambientIntensity: 1.0, cloudLit: '#fbe9c8', cloudShade: '#a58b7c', stars: 0 },
+  dusk: { top: '#4c5671', horizon: '#d39c86', fog: '#9d8a8f', sun: '#ff9d72', sunDir: [0.8, 0.06, -0.6], sunIntensity: 1.2, ambient: '#86809a', ambientIntensity: 0.85, cloudLit: '#e7b39b', cloudShade: '#4d4a63', stars: 0.3 },
+  night: { top: '#070d16', horizon: '#1c2d3d', fog: '#16232f', sun: '#b9cde0', sunDir: [-0.42, 0.55, -0.72], sunIntensity: 0.7, ambient: '#3d5568', ambientIntensity: 0.75, cloudLit: '#344658', cloudShade: '#121b26', stars: 1 },
 };
 
 // Colours the ground takes under each preset (grass blades have their own, below).
 const GROUND: Record<GroundPreset, string> = {
   plain: '#ffffff', // replaced by the page colour
-  grass: '#3d7426',
-  flowers: '#4a8030',
+  grass: '#4f5f2c',
+  flowers: '#55662f',
   sand: '#ead197',
   snow: '#f3f6fb',
   water: '#2f86b5',
@@ -41,8 +42,8 @@ const GROUND: Record<GroundPreset, string> = {
 export const GROUND_KIND: Record<GroundPreset, number> = { plain: 0, grass: 1, flowers: 2, sand: 3, snow: 4, water: 5 };
 
 export const GRASS_COLOURS: Record<'grass' | 'flowers', { base: string; tip: string }> = {
-  grass: { base: '#2b6a1e', tip: '#a9d84c' },
-  flowers: { base: '#3a7a25', tip: '#b8de5c' },
+  grass: { base: '#2c4219', tip: '#b9b45e' },
+  flowers: { base: '#33491c', tip: '#c1bb66' },
 };
 
 // The page's own colours (global.css), for the empty starting world.
@@ -91,6 +92,7 @@ export class Look {
   gust = 0.3;
   gravity = 1;
   night = 0;
+  hills = 0;
 
   /** Fill in the target for a world and theme. */
   setTarget(world: WorldState, theme: Theme, reducedMotion: boolean): this {
@@ -114,7 +116,9 @@ export class Look {
     this.cloudLit.set(p.cloudLit).lerp(grey, overcast * 0.4);
     this.cloudShade.set(p.cloudShade).lerp(grey, overcast * 0.3);
     this.stars = p.stars * (1 - overcast);
-    this.clouds = Math.max(world.sky.clouds, overcast * 0.9);
+    // A painted world always has some overcast; the visitor's setting adds to it.
+    this.clouds = Math.max(painted ? 0.45 + 0.55 * world.sky.clouds : world.sky.clouds, overcast * 0.9);
+    this.hills = painted ? 1 : 0;
     this.painted = painted ? 1 : 0;
     this.night = time === 'night' ? 1 : 0;
 

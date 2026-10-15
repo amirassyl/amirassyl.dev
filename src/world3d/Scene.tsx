@@ -1,7 +1,7 @@
 // Everything inside the canvas: it turns the world state (data) into what is
 // drawn. Each frame the visible "look" eases towards the look the state asks
 // for, so every change animates; a change of ground grows out from Amir.
-import { Suspense, lazy, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Color, Vector2, Vector3, type DirectionalLight, type HemisphereLight } from 'three';
 import type { WorldState } from '../world/schema';
@@ -10,12 +10,14 @@ import { Sky } from './Sky';
 import { Ground, RING_DONE, lightColour, type Ring } from './Ground';
 import { Grass } from './Grass';
 import { Weather } from './Weather';
-import { rim } from './toon';
 import { runtime } from './runtime';
+import { Character } from './Character';
+import { terrainHeight } from './terrain';
+import { Detect } from './Detect';
+import { isPainted } from './look';
 
-const CAMERA_DISTANCE = 6;
-// The physics engine (and Amir, who needs it) arrive a moment after the world, in their own download.
-const Physical = lazy(() => import('./Physical'));
+// Far enough back that Amir is small in a big landscape, like the reference photos.
+const CAMERA_DISTANCE = 10;
 
 function FollowCamera({ reducedMotion }: { reducedMotion: boolean }) {
   const { camera } = useThree();
@@ -23,9 +25,11 @@ function FollowCamera({ reducedMotion }: { reducedMotion: boolean }) {
   const want = useMemo(() => new Vector3(), []);
   useFrame((_, delta) => {
     const dt = Math.min(delta, 1 / 20);
-    target.set(runtime.player.x, runtime.player.y * 0.6 + 1.45, runtime.player.z);
+    target.set(runtime.player.x, runtime.player.y + 1.15, runtime.player.z);
     const horizontal = Math.cos(runtime.pitch) * CAMERA_DISTANCE;
     want.set(target.x + Math.sin(runtime.yaw) * horizontal, target.y + Math.sin(runtime.pitch) * CAMERA_DISTANCE, target.z + Math.cos(runtime.yaw) * horizontal);
+    // Never inside a hill.
+    want.y = Math.max(want.y, terrainHeight(want.x, want.z) + 0.7);
     camera.position.lerp(want, reducedMotion ? 1 : 1 - Math.exp(-dt * 6));
     camera.lookAt(target);
   });
@@ -72,8 +76,7 @@ export function Scene({ world, theme, mobile, reducedMotion }: { world: WorldSta
       if (ring.radius >= RING_DONE) ring.from = ring.to;
     }
     lightColour(look, light);
-    rim.color.value.copy(look.sun).lerp(look.horizon, 0.4);
-    rim.strength.value = 0.18 + 0.25 * look.painted;
+    runtime.hills = look.hills;
     if (sun.current) {
       sun.current.color.copy(look.sun);
       sun.current.intensity = look.sunIntensity * (0.55 + 0.45 * look.painted);
@@ -91,14 +94,17 @@ export function Scene({ world, theme, mobile, reducedMotion }: { world: WorldSta
   return (
     <>
       <FollowCamera reducedMotion={reducedMotion} />
+      <Detect painted={isPainted(world) ? 1 : 0} />
       <directionalLight ref={sun} />
       <hemisphereLight ref={sky} />
+      {/* Only Amir uses three.js lights (the world has its own shaders), so this lifts him out of silhouette. */}
+      <ambientLight intensity={1.1} color="#f2efe6" />
       <Sky look={look} />
       <Ground look={look} ring={ring} />
       <Grass look={look} ring={ring} light={light} mobile={mobile} />
       <Weather {...weatherFor(world, theme)} look={look} mobile={mobile} reducedMotion={reducedMotion} />
       <Suspense fallback={null}>
-        <Physical gravity={world.physics.gravity} reducedMotion={reducedMotion} />
+        <Character gravity={world.physics.gravity} reducedMotion={reducedMotion} />
       </Suspense>
     </>
   );

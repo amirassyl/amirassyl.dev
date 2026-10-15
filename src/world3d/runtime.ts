@@ -10,13 +10,17 @@ export const runtime = {
   speed: 0,
   /** Camera angle around Amir (radians) and how far above him it looks down from. */
   yaw: 0,
-  pitch: 0.26,
+  pitch: 0.17,
   /** Movement input from the keyboard or the joystick, x = right, y = forward, each -1..1. */
   stick: { x: 0, y: 0 },
   keys: new Set<string>(),
   jump: false,
   /** True while Pixel Amir is thinking about a prompt: he raises his arms and sparkles gather. */
   casting: false,
+  /** How tall the rolling hills are right now, 0 (flat page) to 1 (steppe). Eased by the scene. */
+  hills: 0,
+  /** Which animation Amir is playing, for anything that reacts to him. */
+  moving: false,
   /** 0.35..1, lowered when the frame rate drops. */
   quality: 1,
 };

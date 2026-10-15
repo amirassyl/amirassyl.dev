@@ -6,6 +6,8 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Color, ShaderMaterial, Vector2, Vector3, type Mesh } from 'three';
 import { NOISE } from './glsl';
+import { TERRAIN } from './terrain';
+import { runtime } from './runtime';
 import { GROUND_KIND, type Look } from './look';
 import type { GroundPreset } from '../world/schema';
 
@@ -20,8 +22,10 @@ export const RING_DONE = 160;
 
 const vertex = /* glsl */ `
 varying vec3 vWorld;
+${TERRAIN}
 void main() {
   vec4 world = modelMatrix * vec4(position, 1.0);
+  world.y += terrainHeight(world.xz);
   vWorld = world.xyz;
   gl_Position = projectionMatrix * viewMatrix * world;
 }
@@ -57,9 +61,10 @@ vec3 layer(float kind, vec3 base, vec2 p, float dist) {
     return mix(base, uDot, dot * fade);
   }
   if (kind < 2.5) {
-    // Soil under the grass: patches of lighter and darker green.
-    float n = fbm(p * 0.18);
-    return base * (0.78 + 0.4 * n);
+    // Under the grass: the field as seen from far away, with soft lighter and darker drifts.
+    float n = fbm(p * 0.06 + vec2(0.0, uTime * 0.01));
+    float streak = fbm(vec2(p.x * 0.05, p.y * 0.18));
+    return base * (0.8 + 0.3 * n + 0.15 * streak);
   }
   if (kind < 3.5) {
     // Sand with wind ripples.
@@ -114,7 +119,7 @@ export function groundColour(preset: GroundPreset, look: Look, out: Color): Colo
   if (preset === 'plain') return out.copy(look.bg);
   out.set(SOIL[preset]);
   // Under grass the soil takes on the blades' own colour, so custom colours match.
-  if (preset === 'grass' || preset === 'flowers') out.lerp(scratch.copy(look.grassBase).lerp(look.grassTip, 0.2), 0.7).multiplyScalar(0.85);
+  if (preset === 'grass' || preset === 'flowers') out.lerp(scratch.copy(look.grassBase).lerp(look.grassTip, 0.62), 0.9).multiplyScalar(0.95);
   return out;
 }
 
@@ -142,6 +147,7 @@ export function Ground({ look, ring }: { look: Look; ring: Ring }) {
           uPainted: { value: 0 },
           uTime: { value: 0 },
           uFogFar: { value: 120 },
+          uHills: { value: 0 },
         },
       }),
     [],
@@ -164,13 +170,14 @@ export function Ground({ look, ring }: { look: Look; ring: Ring }) {
     u.uPainted.value = look.painted;
     u.uTime.value = clock.elapsedTime;
     u.uFogFar.value = fogFar(look);
+    u.uHills.value = runtime.hills;
     // The floor moves with the camera in whole metres, so its pattern stays put in the world.
-    if (mesh.current) mesh.current.position.set(Math.round(camera.position.x), 0, Math.round(camera.position.z));
+    if (mesh.current) mesh.current.position.set(Math.round(camera.position.x / 2) * 2, 0, Math.round(camera.position.z / 2) * 2);
   });
 
   return (
     <mesh ref={mesh} material={material} rotation-x={-Math.PI / 2} frustumCulled={false}>
-      <planeGeometry args={[600, 600, 1, 1]} />
+      <planeGeometry args={[480, 480, 240, 240]} />
     </mesh>
   );
 }
@@ -183,4 +190,4 @@ export function lightColour(look: Look, out: Color): Color {
 }
 
 /** The distance at which everything has melted into the fog. */
-export const fogFar = (look: Look) => 60 + 50 * look.painted;
+export const fogFar = (look: Look) => 60 + 70 * look.painted;

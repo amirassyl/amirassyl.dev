@@ -9,7 +9,7 @@ import { applyTool } from '../world/reducer';
 import { Scene } from './Scene';
 import { ask, type Turn } from './ask';
 import { listenToKeys, runtime } from './runtime';
-import type { Theme } from './look';
+import { isPainted, type Theme } from './look';
 
 const STORAGE_KEY = 'world-state';
 const SUGGESTIONS = ['Turn the floor into cinematic grass', 'Make it windy', 'Golden hour', 'Make it rain', 'Night with fireflies', 'Low gravity', 'Reset'];
@@ -93,7 +93,7 @@ export function App() {
         flat
         dpr={dpr}
         frameloop={hidden ? 'never' : 'always'}
-        camera={{ fov: 50, near: 0.1, far: 1200, position: [0, 2.9, 5.2] }}
+        camera={{ fov: 35, near: 0.1, far: 1200, position: [0, 2.8, 10] }}
         gl={{ antialias: !mobile, powerPreference: 'high-performance' }}
         onCreated={() => document.documentElement.classList.add('world-ready')}
       >
@@ -109,6 +109,11 @@ export function App() {
         />
         <Scene world={world} theme={theme} mobile={mobile} reducedMotion={reducedMotion} />
       </Canvas>
+      <div className="world-film" data-painted={isPainted(world) ? '' : undefined} aria-hidden="true" />
+      <div className="world-detect" aria-hidden="true">
+        <i id="detect-body"><b>amir 0.97</b></i>
+        <i id="detect-head"><b>face</b></i>
+      </div>
       <CameraDrag />
       {touch && <TouchControls />}
       <Chat world={worldRef} apply={apply} />

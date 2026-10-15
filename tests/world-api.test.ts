@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { handleWorld, readWorldRequest } from '../worker/world';
-import { allowWasm } from '../worker/index';
 import { defaultWorld } from '../src/world/schema';
 
 const URL_ = 'https://amirassyl.dev/api/world';
@@ -100,12 +99,5 @@ describe('handleWorld', () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response('quota', { status: 429 })));
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect((await handleWorld(post(body()), env('k'))).status).toBe(503);
-  });
-});
-
-describe('the /3d/ CSP', () => {
-  it("adds 'wasm-unsafe-eval' to script-src only", () => {
-    const response = allowWasm(new Response('x', { headers: { 'Content-Security-Policy': "default-src 'none'; script-src 'self'; connect-src 'self'" } }));
-    expect(response.headers.get('Content-Security-Policy')).toBe("default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'");
   });
 });
