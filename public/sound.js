@@ -206,9 +206,9 @@
       noise({ f: 6000, f2: 900, q: 4, dur: 0.7, attack: 0.25, peak: 0.07, wet: 0.3 });
       tone({ f: 180, f2: 540, dur: 0.6, attack: 0.2, peak: 0.08, lp: 1400 });
     },
-    // Confirms the speaker was switched on: one short, soft rising blip.
+    // Confirms the speaker was switched on: one short, soft rising blip, as loud as the day/night switch.
     on() {
-      tone({ f: 740, f2: 880, dur: 0.12, peak: 0.04, attack: 0.012, lp: 2000 });
+      tone({ f: 740, f2: 880, dur: 0.12, peak: 0.2, attack: 0.012, lp: 2000 });
     },
   };
 
