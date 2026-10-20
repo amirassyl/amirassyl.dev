@@ -14,5 +14,8 @@
    automatic weights, re-rests the skeleton to the source orientations so the 14 animations (idle,
    walk, jog, sprint, jump, spell-cast, talk, dance, sit) play as authored, and exports the GLB.
 
+4. **Clothes.** `cloth_split.py` splits the model into body, shirt and trousers (by texture colour), paints out the illustration's outline lines, adds spring-bone chains to the shirt hem and trouser legs, and exports. In the browser `src/world3d/springCloth.ts` simulates those chains with `@pixiv/three-vrm-springbone` (wind, gravity, movement, leg and hip colliders).
+5. **Posture.** The stock idle is a combat stance, so `Idle_Relaxed` was authored in Blender (upright, open hands, breathing loop), and the walk and jog keys were corrected (head up, straighter back, softer elbows, open hands).
+
 `build_amir.py`, `export.py`, `common.py` and `views.py` are the earlier attempt (the mannequin
 restyled by hand in headless Blender), kept for reference.
