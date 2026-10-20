@@ -1,5 +1,6 @@
-// Amir: a rigged model (public/models/amir.glb, built in Blender from a CC0
-// base, see scripts/character) with idle, walk, jog, jump and spell-cast
+// Amir: a rigged model (public/models/amir.glb: a Gemini character sheet made
+// from his photos, turned into 3D with TRELLIS, rigged in Blender on Quaternius'
+// CC0 skeleton, see scripts/character) with idle, walk, jog, jump and spell-cast
 // animations. He walks with WASD or the arrows (or the touch joystick), jogs
 // with Shift, jumps with space, and casts while a prompt is being answered.
 // No physics engine: the ground is a height function (terrain.ts), so a few
@@ -7,7 +8,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useAnimations, useGLTF } from '@react-three/drei';
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Group, LoopOnce, PointsMaterial, Vector3, type AnimationAction, type Mesh } from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Group, LoopOnce, PointsMaterial, Vector3, type AnimationAction, type Mesh, type MeshStandardMaterial } from 'three';
 import { moveInput, runtime } from './runtime';
 import { terrainHeight } from './terrain';
 
@@ -65,7 +66,14 @@ export function Character({ gravity, reducedMotion }: { gravity: number; reduced
   useEffect(() => {
     scene.traverse((object) => {
       const mesh = object as Mesh;
-      if (mesh.isMesh) mesh.frustumCulled = false; // skinned bounds don't follow the animation
+      if (!mesh.isMesh) return;
+      mesh.frustumCulled = false; // skinned bounds don't follow the animation
+      // Generated models often come out metallic, which renders black without an environment map.
+      for (const material of [mesh.material].flat() as MeshStandardMaterial[]) {
+        if (!material || !('metalness' in material)) continue;
+        material.metalness = 0;
+        material.roughness = Math.max(material.roughness, 0.75);
+      }
     });
   }, [scene]);
 

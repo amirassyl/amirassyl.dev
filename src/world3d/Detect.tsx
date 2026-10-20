@@ -7,7 +7,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { runtime } from './runtime';
 
-const HEIGHT = 1.86;
+const HEIGHT = 1.78;
 
 function rect(el: HTMLElement | null, x0: number, y0: number, x1: number, y1: number, opacity: number) {
   if (!el) return;
