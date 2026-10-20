@@ -19,9 +19,11 @@ interface Props {
   trail?: { href: string; label: string }[];
   /** Use the wider column, for pages such as the video grid. */
   wide?: boolean;
+  /** A full-window page (the 3D world): no breadcrumb, no cursor dots, ripples or corner Pixel Amir, and a link back to the 2D site. */
+  bare?: boolean;
 }
 
-const { title, description = site.description, type = 'website', publishedTime, structuredData, noindex = false, trail = [], wide = false } = Astro.props;
+const { title, description = site.description, type = 'website', publishedTime, structuredData, noindex = false, trail = [], wide = false, bare = false } = Astro.props;
 const pageTitle = title ? `${title} · ${site.shortName}` : site.title;
 const origin = Astro.site ?? new URL(site.url);
 const canonical = new URL(Astro.url.pathname, origin);
@@ -75,7 +77,14 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
     <a class="skip" href="#main">Skip to content</a>
     <div class="corner">
       {
-        hasVideos && (
+        bare && (
+          <a class="corner-link back-2d" href="/">
+            Back to 2D
+          </a>
+        )
+      }
+      {
+        hasVideos && !bare && (
           <a class="corner-link" href="/videos/" aria-label="Videos" title="Videos" aria-current={path.startsWith('/videos/') ? 'page' : undefined}>
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
               <rect x="3" y="5" width="18" height="14" rx="3" />
@@ -84,12 +93,16 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
           </a>
         )
       }
-      <a class="corner-link" href="/resume/" aria-label="CV" title="CV" aria-current={path.startsWith('/resume/') ? 'page' : undefined}>
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path d="M14 3H7.5A1.5 1.5 0 0 0 6 4.5v15A1.5 1.5 0 0 0 7.5 21h9a1.5 1.5 0 0 0 1.5-1.5V7Z" />
-          <path d="M14 3v4h4M9 12h6M9 15.5h6" />
-        </svg>
-      </a>
+      {
+        !bare && (
+          <a class="corner-link" href="/resume/" aria-label="CV" title="CV" aria-current={path.startsWith('/resume/') ? 'page' : undefined}>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path d="M14 3H7.5A1.5 1.5 0 0 0 6 4.5v15A1.5 1.5 0 0 0 7.5 21h9a1.5 1.5 0 0 0 1.5-1.5V7Z" />
+              <path d="M14 3v4h4M9 12h6M9 15.5h6" />
+            </svg>
+          </a>
+        )
+      }
       <button class="sound-toggle" type="button" aria-label="Turn sound on" aria-pressed="false">
         <svg class="muted" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
           <path d="M11 5 6.5 9h-3v6h3L11 19Z" />
@@ -111,7 +124,7 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
       </button>
     </div>
     {
-      path !== '/' && (
+      path !== '/' && !bare && (
         <header class:list={[wide ? 'wide' : 'wrap', 'crumb']}>
           <nav aria-label="Breadcrumb">
             <a href="/">{site.shortName}</a>
@@ -130,9 +143,15 @@ const jsonLd = structuredData ? [structuredData].flat() : path === '/' ? [person
       <slot />
     </main>
     <script is:inline defer src={`/sound.js?v=${soundVersion}`}></script>
-    <script is:inline defer src={`/trail.js?v=${trailVersion}`} data-portrait={`/me.jpg?v=${portraitVersion}`}></script>
-    <script is:inline defer src={`/ripple.js?v=${rippleVersion}`}></script>
-    <script is:inline defer src={`/twin.js?v=${twinVersion}`}></script>
+    {
+      !bare && (
+        <>
+          <script is:inline defer src={`/trail.js?v=${trailVersion}`} data-portrait={`/me.jpg?v=${portraitVersion}`}></script>
+          <script is:inline defer src={`/ripple.js?v=${rippleVersion}`}></script>
+          <script is:inline defer src={`/twin.js?v=${twinVersion}`}></script>
+        </>
+      )
+    }
     <slot name="scripts" />
   </body>
 </html>

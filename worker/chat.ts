@@ -12,22 +12,22 @@ export interface ChatEnv {
   CHAT_SITE_LIMIT?: RateLimiter;
 }
 
-interface RateLimiter {
+export interface RateLimiter {
   limit(options: { key: string }): Promise<{ success: boolean }>;
 }
 
-type Turn = { role: 'user' | 'model'; text: string };
+export type Turn = { role: 'user' | 'model'; text: string };
 
-const MODEL = 'gemini-3.5-flash-lite';
+export const MODEL = 'gemini-3.5-flash-lite';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:streamGenerateContent?alt=sse`;
-const MAX_TURNS = 10; // only the end of a long chat is sent, which keeps each request small
-const MAX_CHARS = 500; // per message, same as the input's maxlength
+export const MAX_TURNS = 10; // only the end of a long chat is sent, which keeps each request small
+export const MAX_CHARS = 500; // per message, same as the input's maxlength
 
 // Replies the bubble shows when Gemini can't answer. The browser picks one by status code.
-const SLOW_DOWN = 429; // this visitor is sending too fast
-const NO_REPLY = 502; // Gemini answered with nothing, twice
-const SLEEPING = 503; // the site-wide limit or Gemini's free daily quota ran out
-const ATTEMPTS = 2; // Gemini sometimes ends with no text (finishReason MALFORMED_RESPONSE); one retry fixes it
+export const SLOW_DOWN = 429; // this visitor is sending too fast
+export const NO_REPLY = 502; // Gemini answered with nothing, twice
+export const SLEEPING = 503; // the site-wide limit or Gemini's free daily quota ran out
+export const ATTEMPTS = 2; // Gemini sometimes ends with no text (finishReason MALFORMED_RESPONSE); one retry fixes it
 
 export async function handleChat(request: Request, env: ChatEnv): Promise<Response> {
   if (request.method !== 'POST') return new Response(null, { status: 405, headers: { Allow: 'POST' } });
@@ -100,7 +100,7 @@ async function startedReply(text: ReadableStream<string>): Promise<ReadableStrea
 }
 
 // Accept only a short, well-formed history that ends with the visitor's message.
-function readTurns(body: unknown): Turn[] | null {
+export function readTurns(body: unknown): Turn[] | null {
   const messages = (body as { messages?: unknown } | null)?.messages;
   if (!Array.isArray(messages) || messages.length === 0) return null;
   const turns: Turn[] = [];

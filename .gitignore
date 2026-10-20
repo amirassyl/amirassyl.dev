@@ -9,3 +9,4 @@ dist/
 
 # Local Worker secrets (wrangler dev)
 .dev.vars*
+.playwright-mcp/
