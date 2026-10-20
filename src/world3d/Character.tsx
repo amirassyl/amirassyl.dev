@@ -79,7 +79,9 @@ export function Character({ gravity, reducedMotion, look }: { gravity: number; r
         material.metalness = 0;
         material.roughness = Math.max(material.roughness, 0.75);
       }
-      if ((mesh as SkinnedMesh).isSkinnedMesh) cloth.current.push({ mesh: mesh as SkinnedMesh, u: makeFlowy(mesh as SkinnedMesh) });
+      // The inner torso and legs (the body under the clothes) stay still, so the cloth never shows through.
+      const inner = /inner/i.test(mesh.name) || /inner/i.test(mesh.parent?.name ?? '');
+      if ((mesh as SkinnedMesh).isSkinnedMesh && !inner) cloth.current.push({ mesh: mesh as SkinnedMesh, u: makeFlowy(mesh as SkinnedMesh) });
     });
     springs.current = makeSpringCloth(scene);
   }, [scene]);
