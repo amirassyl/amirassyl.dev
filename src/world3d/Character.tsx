@@ -8,9 +8,11 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useAnimations, useGLTF } from '@react-three/drei';
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Group, LoopOnce, PointsMaterial, Vector3, type AnimationAction, type Mesh, type MeshStandardMaterial } from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Group, LoopOnce, PointsMaterial, Vector3, type AnimationAction, type Mesh, type MeshStandardMaterial, type SkinnedMesh } from 'three';
 import { moveInput, runtime } from './runtime';
 import { terrainHeight } from './terrain';
+import { makeFlowy, updateFlow, type ClothUniforms } from './clothFlow';
+import type { Look } from './look';
 
 export const MODEL_URL = '/models/amir.glb';
 const WALK = 1.9; // m/s, the pace of the walk animation
@@ -19,7 +21,7 @@ const JUMP = 4.4; // m/s straight up, so low gravity means much higher jumps
 const G = 9.81;
 const FADE = 0.28; // seconds to cross-fade between animations
 
-type Clip = 'Idle_Loop' | 'Walk_Loop' | 'Jog_Fwd_Loop' | 'Jump_Start' | 'Jump_Loop' | 'Jump_Land' | 'Spell_Simple_Enter' | 'Spell_Simple_Idle_Loop' | 'Spell_Simple_Shoot';
+type Clip = 'Idle_Relaxed' | 'Walk_Loop' | 'Jog_Fwd_Loop' | 'Jump_Start' | 'Jump_Loop' | 'Jump_Land' | 'Spell_Simple_Enter' | 'Spell_Simple_Idle_Loop' | 'Spell_Simple_Shoot';
 
 /** Sparkles that spiral in above Amir's raised hands while he casts. */
 function Sparkles({ visible }: { visible: React.RefObject<number> }) {
@@ -45,7 +47,7 @@ function Sparkles({ visible }: { visible: React.RefObject<number> }) {
   return <points geometry={geometry} material={material} frustumCulled={false} />;
 }
 
-export function Character({ gravity, reducedMotion }: { gravity: number; reducedMotion: boolean }) {
+export function Character({ gravity, reducedMotion, look }: { gravity: number; reducedMotion: boolean; look: Look }) {
   const root = useRef<Group>(null);
   const { scene, animations } = useGLTF(MODEL_URL, false, false);
   const { actions } = useAnimations(animations, root);
@@ -62,6 +64,7 @@ export function Character({ gravity, reducedMotion }: { gravity: number; reduced
   });
   const sparkle = useRef(0);
   const wish = useMemo(() => new Vector3(), []);
+  const cloth = useRef<{ mesh: SkinnedMesh; u: ClothUniforms }[]>([]);
 
   useEffect(() => {
     scene.traverse((object) => {
@@ -74,6 +77,7 @@ export function Character({ gravity, reducedMotion }: { gravity: number; reduced
         material.metalness = 0;
         material.roughness = Math.max(material.roughness, 0.75);
       }
+      if ((mesh as SkinnedMesh).isSkinnedMesh) cloth.current.push({ mesh: mesh as SkinnedMesh, u: makeFlowy(mesh as SkinnedMesh) });
     });
   }, [scene]);
 
@@ -157,9 +161,11 @@ export function Character({ gravity, reducedMotion }: { gravity: number; reduced
     else if (horizontal > 0.3) play(horizontal > (WALK + JOG) / 2 ? 'Jog_Fwd_Loop' : 'Walk_Loop', false, Math.max(0.6, horizontal / (horizontal > (WALK + JOG) / 2 ? JOG : WALK)));
     else if (runtime.casting) play('Spell_Simple_Idle_Loop');
     else if (now < s.shootUntil) play('Spell_Simple_Shoot', true);
-    else play('Idle_Loop');
+    else play('Idle_Relaxed');
 
     sparkle.current += ((runtime.casting ? 1 : 0) - sparkle.current) * (1 - Math.exp(-dt * (reducedMotion ? 10 : 4)));
+    // Clothes sway in the world's wind (gentler for visitors who ask for less motion).
+    for (const { mesh, u } of cloth.current) updateFlow(u, mesh, now, look.windDir, look.amp * (reducedMotion ? 0.3 : 1), look.gust, s.vel);
   });
 
   return (

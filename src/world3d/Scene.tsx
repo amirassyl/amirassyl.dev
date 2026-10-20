@@ -104,7 +104,7 @@ export function Scene({ world, theme, mobile, reducedMotion }: { world: WorldSta
       <Grass look={look} ring={ring} light={light} mobile={mobile} />
       <Weather {...weatherFor(world, theme)} look={look} mobile={mobile} reducedMotion={reducedMotion} />
       <Suspense fallback={null}>
-        <Character gravity={world.physics.gravity} reducedMotion={reducedMotion} />
+        <Character gravity={world.physics.gravity} reducedMotion={reducedMotion} look={look} />
       </Suspense>
     </>
   );
