@@ -11,9 +11,9 @@ from mathutils import Vector as V, Matrix
 
 OUT = os.environ.get('AMIR_GLB', 'public/models/amir.glb')
 HEIGHT = 1.80
-KEEP = ['Idle_Loop', 'Walk_Loop', 'Jog_Fwd_Loop', 'Sprint_Loop', 'Jump_Start', 'Jump_Loop', 'Jump_Land',
+KEEP = ['Idle_Relaxed', 'Walk_Loop', 'Jog_Fwd_Loop', 'Sprint_Loop', 'Jump_Start', 'Jump_Loop', 'Jump_Land',
         'Spell_Simple_Enter', 'Spell_Simple_Idle_Loop', 'Spell_Simple_Shoot', 'Spell_Simple_Exit',
-        'Idle_Talking_Loop', 'Dance_Loop', 'Sitting_Idle_Loop']
+        'Dance_Loop', 'Sitting_Idle_Loop']
 # Amir's joints in his A-pose (metres, left side; mirrored for the right), measured from the model.
 JOINTS = dict(shoulder_in=(0.02, -0.04, 1.43), shoulder=(0.17, 0.0, 1.40), elbow=(0.255, 0.02, 1.13),
               wrist=(0.30, 0.0, 0.88), handtip=(0.32, 0.0, 0.76), hip=(0.09, 0.0, 0.92),
@@ -46,6 +46,7 @@ bm.to_mesh(mesh.data); bm.free()
 # 2. Fit a copy of the skeleton.
 orig = {b.name: (b.head_local.copy(), b.tail_local.copy(), b.matrix_local.copy()) for b in src.data.bones}
 rig = bpy.data.objects.new('AmirRig', src.data.copy()); bpy.context.scene.collection.objects.link(rig)
+rig.data.pose_position = 'POSE'  # the copy inherits the source's REST display, which would make posing a no-op
 spine_z = lambda z: 0.93 + (z - 0.917) * (1.47 - 0.93) / (1.488 - 0.917)
 head, tail = {}, {}
 for n in ['DEF-hips', 'DEF-spine.001', 'DEF-spine.002', 'DEF-spine.003']:
@@ -107,7 +108,7 @@ for a in list(bpy.data.actions):
     if a.name not in KEEP:
         bpy.data.actions.remove(a)
 rig.animation_data_create()
-idle = bpy.data.actions['Idle_Loop']; rig.animation_data.action = idle; rig.animation_data.action_slot = idle.slots[0]
+idle = bpy.data.actions['Idle_Relaxed']; rig.animation_data.action = idle; rig.animation_data.action_slot = idle.slots[0]
 with bpy.context.temp_override(**ui(), active_object=rig, selected_objects=[rig, mesh]):
     bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', use_selection=True, export_animation_mode='ACTIONS',
                               export_force_sampling=True, export_frame_step=2, export_skins=True, export_morph=False,

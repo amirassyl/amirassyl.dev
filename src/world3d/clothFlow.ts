@@ -7,15 +7,16 @@
 import { BufferAttribute, Matrix4, Vector3, type MeshStandardMaterial, type SkinnedMesh } from 'three';
 
 // How freely the cloth around each bone moves (0..1). Bone names are Quaternius' UAL rig.
+// Big motion now comes from the spring-bone chains (springCloth.ts); this adds the fine ripple on top.
+// Names as three's GLTFLoader leaves them (dots dropped), so "spine.?001" matches both forms.
 const FLOW: [RegExp, number][] = [
-  [/shin/, 0.85],
-  [/foot/, 0.35],
-  [/thigh/, 0.4],
-  [/hips/, 0.55],
-  [/spine\.001/, 0.45],
-  [/spine\.002/, 0.18],
-  [/forearm/, 0.35],
-  [/upper_arm/, 0.15],
+  [/^cloth_/, 0.45],
+  [/shin/, 0.35],
+  [/thigh/, 0.15],
+  [/hips/, 0.25],
+  [/spine\.?001/, 0.2],
+  [/forearm/, 0.3],
+  [/upper_arm/, 0.12],
 ];
 
 export interface ClothUniforms {

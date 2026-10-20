@@ -12,6 +12,7 @@ import { AdditiveBlending, BufferAttribute, BufferGeometry, Group, LoopOnce, Poi
 import { moveInput, runtime } from './runtime';
 import { terrainHeight } from './terrain';
 import { makeFlowy, updateFlow, type ClothUniforms } from './clothFlow';
+import { makeSpringCloth, updateSpringCloth, type SpringCloth } from './springCloth';
 import type { Look } from './look';
 
 export const MODEL_URL = '/models/amir.glb';
@@ -65,6 +66,7 @@ export function Character({ gravity, reducedMotion, look }: { gravity: number; r
   const sparkle = useRef(0);
   const wish = useMemo(() => new Vector3(), []);
   const cloth = useRef<{ mesh: SkinnedMesh; u: ClothUniforms }[]>([]);
+  const springs = useRef<SpringCloth | null>(null);
 
   useEffect(() => {
     scene.traverse((object) => {
@@ -79,6 +81,7 @@ export function Character({ gravity, reducedMotion, look }: { gravity: number; r
       }
       if ((mesh as SkinnedMesh).isSkinnedMesh) cloth.current.push({ mesh: mesh as SkinnedMesh, u: makeFlowy(mesh as SkinnedMesh) });
     });
+    springs.current = makeSpringCloth(scene);
   }, [scene]);
 
   const play = (clip: Clip, once = false, timeScale = 1) => {
@@ -166,6 +169,7 @@ export function Character({ gravity, reducedMotion, look }: { gravity: number; r
     sparkle.current += ((runtime.casting ? 1 : 0) - sparkle.current) * (1 - Math.exp(-dt * (reducedMotion ? 10 : 4)));
     // Clothes sway in the world's wind (gentler for visitors who ask for less motion).
     for (const { mesh, u } of cloth.current) updateFlow(u, mesh, now, look.windDir, look.amp * (reducedMotion ? 0.3 : 1), look.gust, s.vel);
+    if (springs.current) updateSpringCloth(springs.current, scene, dt, now, look.windDir, look.amp * (reducedMotion ? 0.3 : 1), look.gust);
   });
 
   return (
